@@ -856,14 +856,12 @@ fi
 	if [ "$OPTION" == "Yes" ]; then
 	greenMessage "Installing YT-Downloader now"!
 	
-	if [ "$(grep -c 'youtube' /etc/cron.d/ytdl)" -ge 1 ]; then
+	if [ -f /etc/cron.d/ytdl ] && [ "$(grep -c 'youtube' /etc/cron.d/ytdl)" -ge 1 ]; then
 		redMessage "Cronjob already set for YT-DL updater"!
-		elif [ "$(grep -c 'youtube' /etc/cron.d/ytdl)" == 0 ]; then
+	else
 		greenMessage "Installing Cronjob for automatic YT-DL update..."
 		echo "0 0 * * * su $SINUSBOTUSER youtube-dl -U >/dev/null 2>&1">>/etc/cron.d/ytdl
 		greenMessage "Installing Cronjob successful."
-		else
-		redMessage "Error while installing YoutubeDL Cronjob. Skipping."
 		
 		fi
 		
