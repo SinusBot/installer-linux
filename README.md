@@ -25,4 +25,4 @@ The following tasks will be done:
 
 Installation process take circa one minute.
 
-If you use Plesk, there is no support from me!
+If you're using Plesk, there is no support from me!
