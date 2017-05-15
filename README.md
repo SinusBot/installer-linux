@@ -26,3 +26,7 @@ The following tasks will be done:
 Installation process take circa one minute.
 
 If you're using Plesk, there is no support from me!
+
+[![Youtube Video](https://img.youtube.com/vi/_GEd_ert7PA/0.jpg)](https://www.youtube.com/watch?v=_GEd_ert7PA)
+
+YouTube Video
