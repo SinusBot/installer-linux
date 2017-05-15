@@ -62,16 +62,6 @@ function checkInstall {
     fi
 }
 
-# Checking Installer version
-
-#checkInstall wget
-#showversion=$(wget https://sinusbot-installer.de/version -q -O -)
-#if [ $(wget https://sinusbot-installer.de/version -q -O -) == "$Instversion" ]; then
-#	greenMessage "Installer is uptodate"
-#else
-#	errorExit 'Please download a newer installer version! Latest version is $showversion!'
-#fi	
-
 # Must be root. Checking...
 
 if [ "$(id -u)" != "0" ]; then
