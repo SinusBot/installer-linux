@@ -931,6 +931,20 @@ fi
 	ntpdate -s 0.pool.ntp.org >/dev/null 2>&1
 	service ntp start >/dev/null 2>&1
 	
+# Delete files if exists
+
+	if [ -f /tmp/.sinusbot.lock ]; then
+		rm /tmp/.sinusbot.lock
+		greenMessage "Deleted /tmp/.sinusbot.lock"
+		
+		fi
+		
+	if [ -f /tmp/.X11-unix/X40 ]; then
+		rm /tmp/.X11-unix/X40
+		greenMessage "Deleted /tmp/.X11-unix/X40"
+		
+		fi
+	
 # Starting Sinusbot first time!
 	
 	if [ "$INSTALL" != "Updt" ]; then
