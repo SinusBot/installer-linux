@@ -1,5 +1,7 @@
 # Sinusbot Installer [LINUX]
 
+Working distributions: Ubuntu 16.0.4 LTS, Ubuntu 14.0.4 LTS, Debian 8, CentOS 7
+
 Functions:
 - Install
 - Update
