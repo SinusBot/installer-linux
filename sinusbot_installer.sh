@@ -586,9 +586,9 @@ fi
 	magentaMessage "Installing necessary packages! Please wait..."
 	
 	if [ -f /etc/centos-release ]; then
-	yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp ntpdate python >/dev/null 2>&1
+	yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python >/dev/null 2>&1
 	else
-	apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp ntpdate python -y >/dev/null 2>&1
+	apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python -y >/dev/null 2>&1
 	update-ca-certificates >/dev/null 2>&1
 	fi
 
@@ -927,9 +927,7 @@ fi
 
 # Setting server time
 
-	service ntp stop >/dev/null 2>&1
-	ntpdate -s 0.pool.ntp.org >/dev/null 2>&1
-	service ntp start >/dev/null 2>&1
+	ntpd -q -g >/dev/null 2>&1
 	
 # Delete files if exists
 
