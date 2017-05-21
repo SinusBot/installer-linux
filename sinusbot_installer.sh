@@ -7,32 +7,29 @@ set -o history -o histexpand -e
 
 # Vars
 
-USERADD=$(which useradd)
-GROUPADD=$(which groupadd) 
 MACHINE=$(uname -m)
-ipaddress=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
 Instversion="1.3.6"
 
 # Functions
 
 function greenMessage {
-    echo -e "\\033[32;1m${@}\033[0m"
+    echo -e "\\033[32;1m${*}\033[0m"
 }
 
 function magentaMessage {
-    echo -e "\\033[35;1m${@}\033[0m"
+    echo -e "\\033[35;1m${*}\033[0m"
 }
 
 function cyanMessage {
-    echo -e "\\033[36;1m${@}\033[0m"
+    echo -e "\\033[36;1m${*}\033[0m"
 }
 
 function redMessage {
-    echo -e "\\033[31;1m${@}\033[0m"
+    echo -e "\\033[31;1m${*}\033[0m"
 }
 
 function yellowMessage {
-	echo -e "\\033[33;1m${@}\033[0m"
+	echo -e "\\033[33;1m${*}\033[0m"
 }
 
 function errorQuit {
@@ -78,11 +75,11 @@ if [ "$(id -u)" != "0" ]; then
 # Start installer
 	
 if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
-    greenMessage "This is the automatic installer for latest Sinusbot. USE AT YOUR OWN RISK"!
+  greenMessage "This is the automatic installer for latest Sinusbot. USE AT YOUR OWN RISK"!
 	sleep 1
-    cyanMessage "You can choose between installing, upgrading and removing the Sinusbot."
+  cyanMessage "You can choose between installing, upgrading and removing the Sinusbot."
 	sleep 1
-    redMessage "Installer by Philipp Esswein | DAThosting.eu - Your game-/voiceserver hoster (only german)."
+  redMessage "Installer by Philipp Esswein | DAThosting.eu - Your game-/voiceserver hoster (only german)."
 	sleep 1
 	magentaMessage "Please rate this script at: https://forum.sinusbot.com/resources/sinusbot-installer-script.58/"
 	sleep 1
@@ -109,84 +106,78 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
 		INSTALL="Rem"	
 	elif [ "$OPTION" == "PW Reset" ]; then
 		INSTALL="Res"
-
 	fi
 	
 # PW Reset
 
-if [ "$INSTALL" == "Res" ]; then
-	yellowMessage "Automatic usage or own directories?"
-		
-		OPTIONS=("Automatic" "Own path" "Quit")
-		select OPTION in "${OPTIONS[@]}"; do
-			case "$REPLY" in
-				1|2 ) break;;
-				3 ) errorQuit;;
-				*) errorContinue;;
+if [[ $INSTALL == "Res" ]]; then
+  yellowMessage "Automatic usage or own directories?"
+
+  OPTIONS=("Automatic" "Own path" "Quit")
+  select OPTION in "${OPTIONS[@]}"; do
+    case "$REPLY" in
+      1|2 ) break;;
+      3 ) errorQuit;;
+      *) errorContinue;;
 			esac
-		done
+  done
 		
-		if [ "$OPTION" == "Automatic" ]; then
-			LOCATION=/opt/sinusbot			
-			
-		elif [ "$OPTION" == "Own path" ]; then
-			yellowMessage "Enter location where the bot should be installed/updated/removed. Like /opt/sinusbot. Include the / at first position and none at the end"!
+  if [ "$OPTION" == "Automatic" ]; then
+    LOCATION=/opt/sinusbot	
+  elif [ "$OPTION" == "Own path" ]; then
+    yellowMessage "Enter location where the bot should be installed/updated/removed. Like /opt/sinusbot. Include the / at first position and none at the end"!
 		
-			LOCATION=""
-				while [[ ! -d $LOCATION ]]; do
-					read -p -r "Location [/opt/sinusbot]: " LOCATION
-					if [ "$INSTALL" != "Inst" ] && [ ! -d $LOCATION ]; then
-						redMessage "Directory not found, try again"!
-						fi
-				done
+    LOCATION=""
+    while [[ ! -d $LOCATION ]]; do
+      read -rp "Location [/opt/sinusbot]: " LOCATION
+      if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
+        redMessage "Directory not found, try again"!
+      fi
+    done
 			
-			greenMessage "Your directory is $LOCATION."
+    greenMessage "Your directory is $LOCATION."
 			
-			OPTIONS=("Yes" "No, change it" "Quit")
-				select OPTION in "${OPTIONS[@]}"; do
-					case "$REPLY" in
-						1|2 ) break;;
-						3 ) errorQuit;;
-						*) errorContinue;;
-					esac
-				done
+    OPTIONS=("Yes" "No, change it" "Quit")
+    select OPTION in "${OPTIONS[@]}"; do
+      case "$REPLY" in
+        1|2 ) break;;
+        3 ) errorQuit;;
+        *) errorContinue;;
+      esac
+    done
 				
-				if [ "$OPTION" == "No, change it" ]; then
-					LOCATION=""
-					while [[ ! -d $LOCATION ]]; do
-						read -p "Location [/opt/sinusbot]: " LOCATION
-						if [ "$INSTALL" != "Inst" ] && [ ! -d $LOCATION ]; then
-							redMessage "Directory not found, try again"!
-							fi
-					done
+    if [ "$OPTION" == "No, change it" ]; then
+      LOCATION=""
+      while [[ ! -d $LOCATION ]]; do
+        read -rp "Location [/opt/sinusbot]: " LOCATION
+        if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
+          redMessage "Directory not found, try again"!
+        fi
+      done
 					
-					greenMessage "Your directory is $LOCATION."
-					
-					fi
-				
-			fi
+      greenMessage "Your directory is $LOCATION."
+    fi			
+  fi
 			
 			LOCATIONex=$LOCATION/sinusbot
 			
-	if [ ! -f $LOCATION/sinusbot ]; then
+	if [[ ! -f $LOCATION/sinusbot ]]; then
 		errorExit "Sinusbot wasn't found at $LOCATION. Exiting script."
-		fi
+	fi
 			
 	PW=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 	SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
 	
-	greenMessage "Please login to your sinusbot webinterface as admin and "$PW
+	greenMessage "Please login to your sinusbot webinterface as admin and '$PW'"
 	yellowMessage "After that change your password under user accounts->admin. The script restart the bot with init.d or systemd."
 	
 	if [ -f /lib/systemd/system/sinusbot.service ]; then
-		service sinusbot stop
-		
-		fi
+		service sinusbot stop	
+	fi
 		
 	if [ -f /etc/init.d/sinusbot ]; then
 		/etc/init.d/sinusbot stop
-		
-		fi
+	fi
 	
 	log="/tmp/sinusbot.log"
 	match="USER-PATCH [admin] (admin) OK"
@@ -194,15 +185,13 @@ if [ "$INSTALL" == "Res" ]; then
 	su -c "$LOCATIONex --pwreset=$PW" $SINUSBOTUSER > "$log" 2>&1 &
 	sleep 3
 
-	while true
-	do
+	while true; do
 		echo -ne '(Waiting for password change!)\r'
 		
-		if fgrep --quiet "$match" "$log"
-		then
+		if grep -Fq "$match" "$log"; then
 			pkill -f $PW
 			rm $log
-	
+
 			greenMessage "Successfully changed your admin password."
 			
 			if [ -f /lib/systemd/system/sinusbot.service ]; then
@@ -307,8 +296,8 @@ fi
 		
 			LOCATION=""
 				while [[ ! -d $LOCATION ]]; do
-					read -p "Location [/opt/sinusbot]: " LOCATION
-					if [ "$INSTALL" != "Inst" ] && [ ! -d $LOCATION ]; then
+					read -rp "Location [/opt/sinusbot]: " LOCATION
+					if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
 						redMessage "Directory not found, try again"!
 						fi
 					if [ "$INSTALL" == "Inst" ]; then
@@ -333,8 +322,8 @@ fi
 				if [ "$OPTION" == "No, change it" ]; then
 					LOCATION=""
 					while [[ ! -d $LOCATION ]]; do
-						read -p "Location [/opt/sinusbot]: " LOCATION
-						if [ "$INSTALL" != "Inst" ] && [ ! -d $LOCATION ]; then
+						read -rp "Location [/opt/sinusbot]: " LOCATION
+						if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
 							redMessage "Directory not found, try again"!
 							fi
 						if [ "$INSTALL" == "Inst" ]; then
@@ -352,30 +341,27 @@ fi
 			
 # Check if Sinusbot already installed and if update is possible
 
-	if [ "$INSTALL" == "Inst" ]; then
-		if [ -f $LOCATION/sinusbot ]; then
-		redMessage "Sinusbot already installed with automatic install option"!
-		read -p "Would you like to update the bot instead? [Y / N]: " OPTION
+	if [[ $INSTALL == "Inst" ]]; then
+		if [[ -f $LOCATION/sinusbot ]]; then
+			redMessage "Sinusbot already installed with automatic install option"!
+			read -rp "Would you like to update the bot instead? [Y / N]: " OPTION
 		
 			if [ "$OPTION" == "Y" ] || [ "$OPTION" == "y" ] || [ "$OPTION" == "" ]; then
 				INSTALL="Updt"
 			elif [ "$OPTION" == "N" ] || [ "$OPTION" == "n" ]; then
 				errorExit "Installer stops now"!
-				
-				fi
+			fi
 		else
-		greenMessage "Sinusbot isn't installed yet. Installer goes on."
-
+			greenMessage "Sinusbot isn't installed yet. Installer goes on."
 		fi
 		
 	elif [ "$INSTALL" == "Rem" ] || [ "$INSTALL" == "Updt" ]; then
-		if [ ! $LOCATION ]; then
-		errorExit "Sinusbot isn't installed"!
+		if [[ ! $LOCATION ]]; then
+			errorExit "Sinusbot isn't installed"!
 		else
-		greenMessage "Sinusbot is installed. Installer goes on."
-
+			greenMessage "Sinusbot is installed. Installer goes on."
 		fi
-		fi
+	fi
 	
 # Remove Sinusbot
 
@@ -410,7 +396,7 @@ if [ "$INSTALL" == "Rem" ]; then
 		fi
 	fi
 	
-	if [ -z $SINUSBOTUSER ]; then
+	if [[ -z $SINUSBOTUSER ]]; then
 		errorExit "No Sinusbot found. Exiting now."
 		fi
 	
@@ -442,7 +428,7 @@ if [ "$INSTALL" == "Rem" ]; then
 		fi
 
 	if [ -f /lib/systemd/system/sinusbot.service ] && [ "$OS" != "ubuntu" ]; then
-		if [ $(systemctl is-active sinusbot >/dev/null 2>&1 && echo UP || echo DOWN) == "UP" ]; then
+		if [[ $(systemctl is-active sinusbot >/dev/null 2>&1 && echo UP || echo DOWN) == "UP" ]]; then
 			service sinusbot stop 2> /dev/null
 			systemctl disable sinusbot 2> /dev/null
 			rm /lib/systemd/system/sinusbot.service
@@ -470,33 +456,31 @@ if [ "$INSTALL" == "Rem" ]; then
 				
 		fi
 	
-	if [ $SINUSBOTUSER != "root" ]; then
+	if [[ $SINUSBOTUSER != "root" ]]; then
+		redMessage "Remove user \"$SINUSBOTUSER\"?"
 	
-	redMessage "Remove user \"$SINUSBOTUSER\"?"
+		OPTIONS=("Yes" "No")
+    	select OPTION in "${OPTIONS[@]}"; do
+        	case "$REPLY" in
+            	1|2 ) break;;
+            	*) errorContinue;;
+        	esac
+    	done
 	
-	OPTIONS=("Yes" "No")
-    select OPTION in "${OPTIONS[@]}"; do
-        case "$REPLY" in
-            1|2 ) break;;
-            *) errorContinue;;
-        esac
-    done
-	
-	if [ "$OPTION" == "Yes" ]; then
-	pkill -9 -u $(id -u $SINUSBOTUSER)
-	if [ -f /etc/centos-release ]; then
-	userdel -f --remove $SINUSBOTUSER >/dev/null 2>&1
-	else
-	deluser -f --remove-home $SINUSBOTUSER >/dev/null 2>&1
-	fi
-	
-	if [ "$(id $SINUSBOTUSER 2> /dev/null)" == "" ]; then
-		greenMessage "User removed successfully"!
-		else
-		redMessage "Error while removing user"!
+		if [ "$OPTION" == "Yes" ]; then
+			pkill -9 -u $(id -u $SINUSBOTUSER)
+			if [ -f /etc/centos-release ]; then
+				userdel -f --remove $SINUSBOTUSER >/dev/null 2>&1
+			else
+				deluser -f --remove-home $SINUSBOTUSER >/dev/null 2>&1
+			fi
 		
+			if ! id "$SINUSBOTUSER" >/dev/null 2>&1; then
+				greenMessage "User removed successfully"!
+			else
+				redMessage "Error while removing user"!	
+			fi
 		fi
-	fi
 	fi
 
 			
@@ -507,17 +491,17 @@ exit 0
 fi
 	
 # Private usage only!
-	
-	redMessage "This Sinusbot version is only for private use! Accept?"
-	
-	OPTIONS=("No" "Yes")
-    select OPTION in "${OPTIONS[@]}"; do
-        case "$REPLY" in
-            1 ) errorQuit;;
-            2 ) break;;
-            *) errorContinue;;
-        esac
-    done
+
+redMessage "This Sinusbot version is only for private use! Accept?"
+
+OPTIONS=("No" "Yes")
+  select OPTION in "${OPTIONS[@]}"; do
+      case "$REPLY" in
+          1 ) errorQuit;;
+          2 ) break;;
+          *) errorContinue;;
+      esac
+  done
 	
 # Update packages or not
 	
@@ -578,22 +562,25 @@ fi
 		
 #		fi
 
-		DOWNLOAD_URL="http://ftp.4players.de/pub/hosted/ts3/releases/3.0.19.4/TeamSpeak3-Client-linux_amd64-3.0.19.4.run"
-		VERSION="3.0.19.4"
+DOWNLOAD_URL="http://ftp.4players.de/pub/hosted/ts3/releases/3.0.19.4/TeamSpeak3-Client-linux_amd64-3.0.19.4.run"
+VERSION="3.0.19.4"
 
 # Install necessary aptitudes for sinusbot.
 	
 	magentaMessage "Installing necessary packages! Please wait..."
 	
 	if [ -f /etc/centos-release ]; then
-	yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python >/dev/null 2>&1
+	  yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute which >/dev/null 2>&1
 	else
-	apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python -y >/dev/null 2>&1
-	update-ca-certificates >/dev/null 2>&1
+	  apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute2 -y >/dev/null 2>&1
+	  update-ca-certificates >/dev/null 2>&1
 	fi
-
 	
 	greenMessage "Packages installed"!
+
+  USERADD=$(which useradd)
+  GROUPADD=$(which groupadd)
+  ipaddress=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
 
 # Create/check user for sinusbot.
 
@@ -606,7 +593,7 @@ fi
 	
 			SINUSBOTUSER=""
 					while [[ ! $SINUSBOTUSER ]]; do
-						read -p "Username [sinusbot]: " SINUSBOTUSER
+						read -rp "Username [sinusbot]: " SINUSBOTUSER
 						if [ -z "$SINUSBOTUSER" ]; then
 							SINUSBOTUSER=sinusbot
 							fi
@@ -632,12 +619,11 @@ fi
 
 # Create dirs or remove them.
 		
-	    ps -u $SINUSBOTUSER | grep ts3client | awk '{print $1}' | while read PID; do
-        kill $PID
+    ps -u $SINUSBOTUSER | grep ts3client | awk '{print $1}' | while read PID; do
+      kill $PID
 		done
-    if [ -f $LOCATION/ts3client_startscript.run ]; then
-        rm -rf $LOCATION/*
-		
+    if [[ -f $LOCATION/ts3client_startscript.run ]]; then
+      rm -rf $LOCATION/*
 		fi
 	
     makeDir $LOCATION/teamspeak3-client
@@ -650,18 +636,17 @@ fi
 
 	if [ -f CHANGELOG ] && [ $(cat CHANGELOG | awk '/Client Release/{ print $4; exit }') == $VERSION ]; then
 		greenMessage "TS3 already latest version."
-	
 	else
 	
 		greenMessage "Downloading TS3 client files."
 		su -c "curl -O -s $DOWNLOAD_URL" $SINUSBOTUSER
 		fi
 	
-    if [ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run -a ! -f ts3client_linux_$ARCH ]; then        
+    if [[ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run && ! -f ts3client_linux_$ARCH ]]; then        
 		redMessage "Error while downloading TS3-Client with cURL, tying it with wget"
 		su -c "wget -q $DOWNLOAD_URL" $SINUSBOTUSER
 		
-		if [ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run -a ! -f ts3client_linux_$ARCH ]; then		
+		if [[ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run && ! -f ts3client_linux_$ARCH ]]; then		
 		errorExit "Download failed! Exiting now"!
 		
 		fi
@@ -698,23 +683,20 @@ fi
 		greenMessage "Downloading latest Sinusbot."
 				
 		STATUS=$(curl -I https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2 2>&1 | grep "HTTP/" | awk '{print $2}')
-        if [ "$STATUS" == "200" ]; then
-			su -c "curl -O -s https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2" $SINUSBOTUSER
-			
+    if [ "$STATUS" == "200" ]; then
+      su -c "curl -O -s https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2" $SINUSBOTUSER	
 		else
 				redMessage "Error while downloading with cURL (Status = $STATUS). Trying it with wget."
 				if  [ -f /etc/centos-release ]; then
-				yum -y -q install wget
+          yum -y -q install wget
 				fi
 				checkInstall wget
 				su -c "wget -q https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2" $SINUSBOTUSER
-				
 			fi
 
-	if [ ! -f sinusbot-beta.tar.bz2 -a ! -f sinusbot ]; then
+	if [[ ! -f sinusbot-beta.tar.bz2 && ! -f sinusbot ]]; then
 		errorExit "Download failed! Exiting now"!
-		
-		fi
+  fi
 		
 # Installing latest Sinusbot.
 		
@@ -818,29 +800,25 @@ fi
 	
 		cd $LOCATION
 
-if [ "$INSTALL" == "Inst" ]; then
-	
-	if [ ! -f $LOCATION/config.ini ]; then
-		echo 'ListenPort = 8087 
-		ListenHost = "0.0.0.0" 
-		TS3Path = "'$LOCATION'/teamspeak3-client/ts3client_linux_amd64"
-		YoutubeDLPath = ""'>>$LOCATION/config.ini
-		greenMessage "Config.ini created successfully."
+	if [ "$INSTALL" == "Inst" ]; then
+		if [[ ! -f $LOCATION/config.ini ]]; then
+			echo 'ListenPort = 8087 
+			ListenHost = "0.0.0.0" 
+			TS3Path = "'$LOCATION'/teamspeak3-client/ts3client_linux_amd64"
+			YoutubeDLPath = ""'>>$LOCATION/config.ini
+			greenMessage "Config.ini created successfully."
 		else
-		redMessage "Config.ini already exists or creation error"!
-		
+			redMessage "Config.ini already exists or creation error"!
 		fi
+	fi
 	
-fi
-	
-	if [ $(grep -Pq 'sinusbot' /etc/cron.d/sinusbot &>/dev/null) ]; then
+	if [[ -f /etc/cron.d/sinusbot ]]; then
 		redMessage "Cronjob already set for Sinusbot updater"!
-		else
+	else
 		greenMessage "Installing Cronjob for automatic Sinusbot update..."
 		echo "0 0 * * * su $SINUSBOTUSER $LOCATION/sinusbot -update >/dev/null 2>&1">>/etc/cron.d/sinusbot
-		greenMessage "Installing Sinusbot update cronjob successful."
-		
-		fi		
+		greenMessage "Installing Sinusbot update cronjob successful."	
+	fi		
 
 # Installing YT-DL.
 
@@ -854,42 +832,36 @@ fi
     done
 	
 	if [ "$OPTION" == "Yes" ]; then
-	greenMessage "Installing YT-Downloader now"!
-	
+		greenMessage "Installing YT-Downloader now"!
 	if [ -f /etc/cron.d/ytdl ] && [ "$(grep -c 'youtube' /etc/cron.d/ytdl)" -ge 1 ]; then
 		redMessage "Cronjob already set for YT-DL updater"!
 	else
 		greenMessage "Installing Cronjob for automatic YT-DL update..."
 		echo "0 0 * * * su $SINUSBOTUSER youtube-dl -U >/dev/null 2>&1">>/etc/cron.d/ytdl
-		greenMessage "Installing Cronjob successful."
+		greenMessage "Installing Cronjob successful."	
+	fi
+	
+	sed -i 's/YoutubeDLPath = \"\"/YoutubeDLPath = \"\/usr\/local\/bin\/youtube-dl\"/g' $LOCATION/config.ini
 		
-		fi
-		
-		sed -i 's/YoutubeDLPath = \"\"/YoutubeDLPath = \"\/usr\/local\/bin\/youtube-dl\"/g' $LOCATION/config.ini
-		
-		if [ -f /usr/local/bin/youtube-dl ]; then
-			rm /usr/local/bin/youtube-dl
-			
-			fi
+	if [ -f /usr/local/bin/youtube-dl ]; then
+		rm /usr/local/bin/youtube-dl
+	fi
 	
 	STATUS=$(curl -I http://yt-dl.org/downloads/latest/youtube-dl 2>&1 | grep "HTTP/" | awk '{print $2}')
-        if [ "$STATUS" == "302" ]; then
-			curl -L -s http://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
-			
-		else
-				redMessage "Error while downloading youtube-dl with cURL. Trying it with wget."
-				if [ -f /etc/centos-release ]; then
-				yum -y -q install wget
-				fi
-				checkInstall wget
-				wget -q -O /usr/local/bin/youtube-dl http://yt-dl.org/downloads/latest/youtube-dl
-				
-			fi
-		
-		if [ ! -f /usr/local/bin/youtube-dl ]; then
-			errorExit "Download failed! Exiting now"!
-		
+	if [ "$STATUS" == "302" ]; then
+		curl -L -s http://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl	
+	else
+		redMessage "Error while downloading youtube-dl with cURL. Trying it with wget."
+		if [ -f /etc/centos-release ]; then
+			yum -y -q install wget
 		fi
+		checkInstall wget
+		wget -q -O /usr/local/bin/youtube-dl http://yt-dl.org/downloads/latest/youtube-dl	
+	fi
+		
+	if [ ! -f /usr/local/bin/youtube-dl ]; then
+		errorExit "Download failed! Exiting now"!
+	fi
 	
 	chmod a+rx /usr/local/bin/youtube-dl
 		
@@ -933,15 +905,13 @@ fi
 
 	if [ -f /tmp/.sinusbot.lock ]; then
 		rm /tmp/.sinusbot.lock
-		greenMessage "Deleted /tmp/.sinusbot.lock"
-		
-		fi
+		greenMessage "Deleted /tmp/.sinusbot.lock"	
+	fi
 		
 	if [ -f /tmp/.X11-unix/X40 ]; then
 		rm /tmp/.X11-unix/X40
-		greenMessage "Deleted /tmp/.X11-unix/X40"
-		
-		fi
+		greenMessage "Deleted /tmp/.X11-unix/X40"	
+	fi
 	
 # Starting Sinusbot first time!
 	
@@ -964,64 +934,62 @@ fi
 	greenMessage "Starting Sinusbot again. Your admin password = '$password'"
 	fi
 	if [ $OS != "ubuntu" ]; then
-	service sinusbot start
+		service sinusbot start
 	elif [ $OS == "ubuntu" ]; then
-	/etc/init.d/sinusbot start
+		/etc/init.d/sinusbot start
 	fi
 	yellowMessage "Please wait... This will take some seconds"!
 	chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
 	if [ $OS != "ubuntu" ]; then
-	sleep 5
+		sleep 5
 	elif [ $OS == "ubuntu" ]; then
-	sleep 10
+		sleep 10
 	fi
 	
 	if [ -f /etc/centos-release ] ; then
-		zone=$(firewall-cmd --get-active-zones | awk '{print $1; exit}')
-		firewall-cmd --zone=$zone --add-port=8087/tcp --permanent >/dev/null 2>&1
-		firewall-cmd --reload >/dev/null 2>&1
-		
-		fi
+    if rpm -q firewalld; then
+      zone=$(firewall-cmd --get-active-zones | awk '{print $1; exit}')
+		  firewall-cmd --zone=$zone --add-port=8087/tcp --permanent >/dev/null 2>&1
+		  firewall-cmd --reload >/dev/null 2>&1	
+    fi
+	fi
 
 # If startup failed, the script will start normal sinusbot without screen for looking about errors. If startup successed => installation done.
 	
-	if ([ $(systemctl is-active sinusbot >/dev/null 2>&1 && echo UP || echo DOWN) == "UP" ] && [ $OS != "ubuntu" ]) || ([ $(/etc/init.d/sinusbot status | awk '{print $NF; exit}') == "UP" ] && [ $OS == "ubuntu" ]); then
+	if [[ ( $(systemctl is-active sinusbot >/dev/null 2>&1 && echo UP || echo DOWN) == "UP" && $OS != "ubuntu" ) || ( $(/etc/init.d/sinusbot status | awk '{print $NF; exit}') == "UP" && $OS == "ubuntu" ) ]]; then
 
-		if [ "$INSTALL" == "Inst" ]; then
-		greenMessage "Install done"!
-		elif [ "$INSTALL" == "Updt" ]; then
-		greenMessage "Update done"!
-		
+		if [[ $INSTALL == "Inst" ]]; then
+			greenMessage "Install done"!
+		elif [[ $INSTALL == "Updt" ]]; then
+			greenMessage "Update done"!
 		fi
 		
-		if [ ! -f "$LOCATION/README_installer.txt" ]; then
-		yellowMessage 'Generated a README_installer.txt in '$LOCATION' with all commands for the sinusbot...'
-		
+		if [[ ! -f $LOCATION/README_installer.txt ]]; then
+			yellowMessage "Generated a README_installer.txt in $LOCATION with all commands for the sinusbot..."
 		fi
 		
-		if [ "$INSTALL" == "Updt" ]; then
-		if [ -f /lib/systemd/system/sinusbot.service ]; then
-			service sinusbot restart
-			greenMessage "Restarted your bot with systemd."
+		if [[ $INSTALL == "Updt" ]]; then
+			if [ -f /lib/systemd/system/sinusbot.service ]; then
+				service sinusbot restart
+				greenMessage "Restarted your bot with systemd."
 			fi
-		if [ -f /etc/init.d/sinusbot ]; then
-			/etc/init.d/sinusbot restart
-			greenMessage "Restarted your bot with initd."
+			if [ -f /etc/init.d/sinusbot ]; then
+				/etc/init.d/sinusbot restart
+				greenMessage "Restarted your bot with initd."
 			fi
-		greenMessage 'All right. Everything is updated successfully. Sinusbot is UP on "'$ipaddress':8087" :)'
+			greenMessage "All right. Everything is updated successfully. Sinusbot is UP on '$ipaddress:8087' :)"
 		else
-		greenMessage 'All right. Everything is installed successfully. Sinusbot is UP on "'$ipaddress':8087" :) Your login is user = "admin" and password = "'$password'"'
+			greenMessage "All right. Everything is installed successfully. Sinusbot is UP on '$ipaddress:8087' :) Your user = 'admin' and password = '$password'"
 		fi
-		if [ $OS != "ubuntu" ]; then
-		redMessage 'Stop it with "service sinusbot stop".'
-		elif [ $OS == "ubuntu" ]; then
-		redMessage 'Stop it with "/etc/init.d/sinusbot stop".'
+		if [[ $OS != "ubuntu" ]]; then
+			redMessage 'Stop it with "service sinusbot stop".'
+		elif [[ $OS == "ubuntu" ]]; then
+			redMessage 'Stop it with "/etc/init.d/sinusbot stop".'
 		fi
 		magentaMessage "Don't forget to rate this script on: https://forum.sinusbot.com/resources/sinusbot-installer-script.58/"
 		greenMessage "Thank you for using this script! :)"
 		
 		else
-		
 		redMessage "Sinusbot could not start! Starting it directly. Look for errors"!
 		su -c "$LOCATION/sinusbot" $SINUSBOTUSER
 		
