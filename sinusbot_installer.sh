@@ -899,7 +899,7 @@ fi
 		
 # Creating Readme
 	
-	if [ ! -a "$LOCATION/README_installer.txt" ] && [ $OS != "ubuntu" ] ; then
+	if [ ! -a "$LOCATION/README_installer.txt" ] && [ $OS != "ubuntu" ]; then
 	echo '##################################################################################
 # #
 # Usage: service sinusbot {start|stop|status|restart} #
@@ -909,7 +909,7 @@ fi
 # - restart: restart the bot #
 # #
 ##################################################################################'>>$LOCATION/README_installer.txt
-	elif [ ! -a "$LOCATION/README_installer.txt" ] && [ $OS == "ubuntu" ] ; then
+	elif [ ! -a "$LOCATION/README_installer.txt" ] && [ $OS == "ubuntu" ]; then
 	echo '##################################################################################
 # #
 # Usage: /etc/init.d/sinusbot {start|stop|status|restart|console|update|backup} #
@@ -958,6 +958,8 @@ fi
 	if [ -z "$password" ]; then
 		errorExit "Failed to read password, try a reinstall again."
 	fi
+	
+	chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
 
 # Starting bot	
 
