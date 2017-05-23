@@ -1,32 +1,37 @@
-# Sinusbot Installer [LINUX]
+# SinusBot Installer [LINUX]
 
-Working distributions: Ubuntu 16.0.4 LTS, Ubuntu 14.0.4 LTS, Debian 8, CentOS 7
+Offically supported operating systems:
 
-Functions:
-- Install
-- Update
-- Password reset
-- Remove
+- Debian 8+
+- Ubuntu 14.0.4+
+- CentOS 6+
+
+Features:
+
+- Install the sinusbot to a chosen directory
+- Update the bot and youtube-dl
+- Reset the password
+- Uninstall the bot
 
 The following tasks will be done:
 
-- check if linux version (Debian, Ubuntu, CentOS) is supported
-- install TS3 with latest version
-- install all necessary aptitudes
-- create seperate sinusbot user
-- install latest beta bot
-- install YT-DL
-- Cronjob for daily YT-DL update and Sinusbot (once supported)
-- change all filerights
-- generating systemd file => start/stop with "service sinusbot {start|etc}" or init.d "/etc/init.d/sinusbot {start|etc}"
-- deleting unneeded files and archives
-- starting sinusbot after installation
-- option to update and remove the bot
+- Checks if the linux version (Debian, Ubuntu, CentOS) is supported
+- Installs the latest supported version of TS3
+- Installs all necessary package dependencies
+- Creates a seperate sinusbot user
+- Installs the latest sinusbot version
+- Installs youtube-dl
+- Adds a cronjob for daily youtube-dl update and sinusbot (once supported)
+- Sets all the file permissions correctly
+- Generates startup files:
+  - systemd file => `service sinusbot {start|stop|restart|status}`
+  - init.d => `/etc/init.d/sinusbot {start|stop|restart}`
+- Removes all unnessercary files and archives
+- Starts the sinusbot after installation
+- Option to update or remove the bot
 
-Installation process take circa one minute.
+The duration of the installation process depends on your system (how many packages need to be updated, internet connection, processing power) but typically takes about one to five minutes
 
-If you're using Plesk, there is no support from me!
+> There's *no support* for *Plesk* or outdated operating systems like *Debian 7*!
 
-[![Youtube Video](https://img.youtube.com/vi/_GEd_ert7PA/0.jpg)](https://www.youtube.com/watch?v=_GEd_ert7PA)
-
-YouTube Video
+[![Watch video](https://img.youtube.com/vi/_GEd_ert7PA/0.jpg)](https://www.youtube.com/watch?v=_GEd_ert7PA)
