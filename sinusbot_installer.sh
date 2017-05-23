@@ -949,7 +949,7 @@ if [ $OS != "ubuntu" ]; then
 fi
 
 if [ -f /etc/centos-release ] ; then
-  if rpm -q firewalld; then
+  if rpm -q --quiet firewalld; then
     zone=$(firewall-cmd --get-active-zones | awk '{print $1; exit}')
     firewall-cmd --zone=$zone --add-port=8087/tcp --permanent >/dev/null 2>&1
     firewall-cmd --reload >/dev/null 2>&1
