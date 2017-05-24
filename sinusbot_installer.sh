@@ -1,5 +1,5 @@
 #!/bin/bash
-# Sinusbot Installer by Philipp Eßwein - DAThosting.eu philipp.esswein@dathosting.eu
+# SinusBot Installer by Philipp Eßwein - DAThosting.eu philipp.esswein@dathosting.eu
 
 # Simple Error Exit
 
@@ -62,7 +62,7 @@ function checkInstall {
 # Update notify
 
 cyanMessage "Checking for the latest latest installer version"
-LATEST_VERSION=$(wget -q --timeout=60 -O - https://raw.githubusercontent.com/Sinusbot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=INSTALLER_VERSION=")([0-9]\.[0-9]\.[0-9]+)')
+LATEST_VERSION=$(wget -q --timeout=60 -O - https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=INSTALLER_VERSION=")([0-9]\.[0-9]\.[0-9]+)')
 
 if [ "(printf "${LATEST_VERSION}\n${INSTALLER_VERSION}" | sort -V | tail -n 1)" != "$INSTALLER_VERSION" ]; then
     errorExit "Upgrade your installer to version ${LATEST_VERSION}. Or reuse https://sinusbot-installer.de"
