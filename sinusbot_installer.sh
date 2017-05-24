@@ -899,9 +899,8 @@ fi
 
 # Setting server time
 
-service ntp stop
-ntpd -s 0.pool.ntp.org
-service ntp start
+timedatectl set-ntp yes
+timedatectl >/dev/null 2>&1
 
 # Delete files if exists
 
