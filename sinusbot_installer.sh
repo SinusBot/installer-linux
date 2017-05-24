@@ -475,7 +475,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
           deluser -f --remove-home $SINUSBOTUSER >/dev/null 2>&1
         fi
         
-        if ! id "$SINUSBOTUSER" >/dev/null 2>&1; then
+        if [ "$(id $SINUSBOTUSER 2> /dev/null)" == "" ]; then
           greenMessage "User removed successfully"!
         else
           redMessage "Error while removing user"!
@@ -899,7 +899,7 @@ fi
 
 # Setting server time
 
-ntpd -q -g >/dev/null 2>&1
+ntpd -q
 
 # Delete files if exists
 
