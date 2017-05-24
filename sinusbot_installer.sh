@@ -414,7 +414,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     
     redMessage "SinusBot will now be removed completely from your system"!
     
-    greenMessage "Your SinusBotuser is \"$SINUSBOTUSER\"? After select Yes it could take a while."
+    greenMessage "Your SinusBot user is \"$SINUSBOTUSER\"? After select Yes it could take a while."
     
     OPTIONS=("Yes" "No")
     select OPTION in "${OPTIONS[@]}"; do
