@@ -8,7 +8,7 @@ set -o history -o histexpand -e
 # Vars
 
 MACHINE=$(uname -m)
-Instversion="1.3.6"
+INSTALLER_VERSION="1.3.7"
 
 # Functions
 
@@ -58,6 +58,17 @@ function checkInstall {
     apt-get install -y "$1" 2>/dev/null
   fi
 }
+
+# Update notify
+
+cyanMessage "Checking for the latest latest installer version"
+LATEST_VERSION=$(wget -q --timeout=60 -O - https://raw.githubusercontent.com/Sinusbot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=Instversion=")([0-9]\.[0-9]\.[0-9]+)')
+
+if [ "(printf "${LATEST_VERSION}\n${INSTALLER_VERSION}" | sort -V | tail -n 1)" != "$INSTALLER_VERSION" ]; then
+    errorAndExit "Upgrade your installer to version ${LATEST_VERSION}. Or reuse https://sinusbot-installer.de"
+else
+    greenMessage "Your installer is up-to-date."
+fi
 
 # Must be root. Checking...
 
