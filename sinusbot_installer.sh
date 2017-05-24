@@ -8,7 +8,7 @@ set -o history -o histexpand -e
 # Vars
 
 MACHINE=$(uname -m)
-Instversion="1.3.7"
+Instversion="1.3.8"
 
 # Functions
 
