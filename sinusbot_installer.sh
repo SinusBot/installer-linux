@@ -38,7 +38,7 @@ function errorQuit {
 
 function errorExit {
   redMessage "${@}"
-  exit 0
+  exit 1
 }
 
 function errorContinue {
