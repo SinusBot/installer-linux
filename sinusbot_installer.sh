@@ -911,8 +911,12 @@ fi
 
 # Setting server time
 
-timedatectl set-ntp yes
-timedatectl >/dev/null 2>&1
+TEMP_OS_VERSION=$( cat /etc/redhat-release | grep -oE --max-count=1 '([0-9])' | grep -oE '[0-9]' --max-count=1 )
+if [ "$TEMP_OS_VERSION" -ge 7 ]; then
+  timedatectl set-ntp yes
+  timedatectl >/dev/null 2>&1
+fi
+
 
 # Delete files if exists
 
