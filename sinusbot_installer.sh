@@ -62,13 +62,13 @@ function checkInstall {
 # Update notify
 
 cyanMessage "Checking for the latest latest installer version"
-LATEST_VERSION=$(wget -q --timeout=60 -O - https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=Instversion=")([0-9]\.[0-9]\.[0-9]+)')
+LATEST_VERSION=$(wget --no-check-certificate --timeout=60 -qO - https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=Instversion=")([0-9]\.[0-9]\.[0-9]+)')
 
 if [ "$(printf "${LATEST_VERSION}\n${Instversion}" | sort -V | tail -n 1)" != "$Instversion" ]; then
-    errorExit "Outdated installer ${Instversion}. Upgrade your installer to version ${LATEST_VERSION}. Or reuse https://sinusbot-installer.de"
+  errorExit "Outdated installer ${Instversion}. Upgrade your installer to version ${LATEST_VERSION}. Or reuse https://sinusbot-installer.de"
 else
-    greenMessage "Your installer is up-to-date."
-    sleep 1
+  greenMessage "Your installer is up-to-date."
+  sleep 1
 fi
 
 # Must be root. Checking...
@@ -76,12 +76,10 @@ fi
 if [ "$(id -u)" != "0" ]; then
   cyanMessage "Change to root account required"
   su root
-  
 fi
 
 if [ "$(id -u)" != "0" ]; then
   errorExit "Still not root, aborting"
-  
 fi
 
 # Start installer
@@ -215,8 +213,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
         else
           redMessage "Please start your bot normally"!
         fi
-        
-        exit
+        exit 0
       fi
     done
     
@@ -230,7 +227,6 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       greenMessage "Installing redhat-lsb! Please wait."
       yum -y -q install redhat-lsb
       greenMessage "Done"!
-      
     fi
     
     if [ -f /etc/debian_version ]; then
@@ -238,14 +234,12 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       checkInstall debconf-utils
       checkInstall lsb-release
       greenMessage "Done"!
-      
     fi
     
     # Functions from lsb_release
     
     OS=$(lsb_release -i 2> /dev/null | grep 'Distributor' | awk '{print tolower($3)}')
     OSBRANCH=$(lsb_release -c 2> /dev/null | grep 'Codename' | awk '{print $2}')
-    
   fi
   
   # Go on
@@ -255,19 +249,16 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       errorExit "Error: Could not detect OS. Currently only Debian, Ubuntu and CentOS are supported. Aborting"!
       elif [ -z "$OS" ] && ( [ "$(cat /etc/debian_version | awk '{print $1}')" == "7" ] || [ $(cat /etc/debian_version | grep "7.") ] ); then
       errorExit "Debian 7 isn't supported anymore"!
-      
     fi
     
     if [ -z "$OSBRANCH" ] && [ -f /etc/centos-release ]; then
       errorExit "Error: Could not detect branch of OS. Aborting"
-      
     fi
     
     if [ "$MACHINE" == "x86_64" ]; then
       ARCH="amd64"
     else
       errorExit "$MACHINE is not supported"!
-      
     fi
   fi
   
@@ -283,7 +274,6 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     
     if [ "$OPTION" == "init.d" ]; then
       OS="ubuntu"
-      
     fi
   fi
   
@@ -344,9 +334,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       done
       
       greenMessage "Your directory is $LOCATION."
-      
     fi
-    
   fi
   
   LOCATIONex=$LOCATION/sinusbot
@@ -395,16 +383,13 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       if [ "$OPTION" == "Yes" ]; then
         if [ -f /usr/local/bin/youtube-dl ]; then
           rm /usr/local/bin/youtube-dl
-          
         fi
         
         if [ -f /etc/cron.d/ytdl ]; then
           rm /etc/cron.d/ytdl
-          
         fi
         
         greenMessage "Removed YT-DL successfully"!
-        
       fi
     fi
     
@@ -429,14 +414,12 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       ps ax | grep sinusbot | grep SCREEN | awk '{print $1}' | while read PID; do
         kill $PID
       done
-      
     fi
     
     if [ "$(ps ax | grep ts3bot | grep SCREEN)" ]; then
       ps ax | grep ts3bot | grep SCREEN | awk '{print $1}' | while read PID; do
         kill $PID
       done
-      
     fi
     
     if [ -f /lib/systemd/system/sinusbot.service ] && [ "$OS" != "ubuntu" ]; then
@@ -465,7 +448,6 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       greenMessage "Files removed successfully"!
     else
       redMessage "Error while removing files."
-      
     fi
     
     if [[ $SINUSBOTUSER != "root" ]]; then
@@ -495,11 +477,9 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       fi
     fi
     
-    
     greenMessage "SinusBot removed completely including all directories."
     
     exit 0
-    
   fi
   
   # Private usage only!
@@ -548,31 +528,28 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       yum -y -q install curl >/dev/null 2>&1
     else
       checkInstall curl
-      
     fi
   fi
 fi
 
 # TeamSpeak3-Client latest check || Deactivated till botupdate
 
-#	greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
+# greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-#	for VERSION in ` curl -s http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1`; do
-#        DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
-#        STATUS=`curl -I $DOWNLOAD_URL_VERSION 2>&1 | grep "HTTP/" | awk '{print $2}'`
-#        if [ "$STATUS" == "200" ]; then
-#            DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
-#            break
+# for VERSION in ` curl -s http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1`; do
+#   DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
+#   STATUS=`curl -I $DOWNLOAD_URL_VERSION 2>&1 | grep "HTTP/" | awk '{print $2}'`
+#   if [ "$STATUS" == "200" ]; then
+#     DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
+#     break
+#   fi
+# done
 
-#			fi
-#    done
-
-#	if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
-#        greenMessage "Detected latest TS3-Client version as $VERSION with download URL $DOWNLOAD_URL"
-#		else
-#        errorExit "Could not detect latest TS3-Client version"
-
-#		fi
+# if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
+#   greenMessage "Detected latest TS3-Client version as $VERSION with download URL $DOWNLOAD_URL"
+# else
+#   errorExit "Could not detect latest TS3-Client version"
+# fi
 
 DOWNLOAD_URL="http://ftp.4players.de/pub/hosted/ts3/releases/3.0.19.4/TeamSpeak3-Client-linux_amd64-3.0.19.4.run"
 VERSION="3.0.19.4"
@@ -583,6 +560,7 @@ magentaMessage "Installing necessary packages! Please wait..."
 
 if [ -f /etc/centos-release ]; then
   yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute which >/dev/null 2>&1
+  update-ca-certificates >/dev/null 2>&1
 else
   apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute2 -y >/dev/null 2>&1
   update-ca-certificates >/dev/null 2>&1
@@ -621,11 +599,9 @@ else
     else
       $GROUPADD $SINUSBOTUSER
       $USERADD -m -b /home -s /bin/bash -g $SINUSBOTUSER $SINUSBOTUSER
-      
     fi
   else
     greenMessage "User \"$SINUSBOTUSER\" already exists."
-    
   fi
 fi
 
@@ -660,7 +636,6 @@ if [[ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run && ! -f ts3client_linux_$A
   
   if [[ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run && ! -f ts3client_linux_$ARCH ]]; then
     errorExit "Download failed! Exiting now"!
-    
   fi
   
 fi
@@ -685,7 +660,6 @@ if [ -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run ]; then
   rm -R ./TeamSpeak3-Client-linux_$ARCH
   
   greenMessage "TS3 client install done."
-  
 fi
 
 # Downloading latest SinusBot.
@@ -726,7 +700,6 @@ if [ "$INSTALL" == "Inst" ]; then
   greenMessage "SinusBot update done."
 fi
 
-
 if [ $OS != "ubuntu" ]; then
   
   if [ -f /etc/systemd/system/sinusbot.service ]; then
@@ -741,7 +714,6 @@ if [ $OS != "ubuntu" ]; then
   STATUS=$(curl -I https://raw.githubusercontent.com/Xuxe/Sinusbot-Startscript/master/sinusbot.service 2>&1 | grep "HTTP/" | awk '{print $2}')
   if [ "$STATUS" == "200" ]; then
     curl -O -s https://raw.githubusercontent.com/Xuxe/Sinusbot-Startscript/master/sinusbot.service
-    
   else
     redMessage "Error while downloading systemd script with cURL. Trying it with wget."
     if  [ -f /etc/centos-release ]; then
@@ -749,12 +721,10 @@ if [ $OS != "ubuntu" ]; then
     fi
     checkInstall wget
     wget -q https://raw.githubusercontent.com/Xuxe/Sinusbot-Startscript/master/sinusbot.service
-    
   fi
   
   if [ ! -f sinusbot.service ]; then
     errorExit "Download failed! Exiting now"!
-    
   fi
   
   sed -i 's/User=YOUR_USER/User='$SINUSBOTUSER'/g' /lib/systemd/system/sinusbot.service
@@ -773,7 +743,6 @@ if [ $OS != "ubuntu" ]; then
   STATUS=$(curl -I https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot 2>&1 | grep "HTTP/" | awk '{print $2}')
   if [ "$STATUS" == "200" ]; then
     curl -O -s https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot
-    
   else
     redMessage "Error while downloading init.d script with cURL. Trying it with wget."
     if  [ -f /etc/centos-release ]; then
@@ -781,7 +750,6 @@ if [ $OS != "ubuntu" ]; then
     fi
     checkInstall wget
     wget -q https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot
-    
   fi
   
   if [ ! -f sinusbot ]; then
@@ -799,15 +767,11 @@ if [ $OS != "ubuntu" ]; then
     
   else
     update-rc.d sinusbot defaults >/dev/null 2>&1
-    
   fi
   
   greenMessage 'Installed init.d file to start the SinusBot with "/etc/init.d/sinusbot {start|stop|status|restart|console|update|backup}"'
-  
 else
-  
   errorExit "Error while checking systemd or init.d script. Ask the author for help."
-  
 fi
 
 cd $LOCATION
@@ -945,9 +909,9 @@ if [ "$INSTALL" != "Updt" ]; then
   chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
   
   # Starting bot
-  
   greenMessage "Starting SinusBot again. Your admin password = '$password'"
 fi
+
 if [ $OS != "ubuntu" ]; then
   service sinusbot start
   elif [ $OS == "ubuntu" ]; then
@@ -1007,7 +971,6 @@ if [[ ( $(systemctl is-active sinusbot >/dev/null 2>&1 && echo UP || echo DOWN) 
 else
   redMessage "SinusBot could not start! Starting it directly. Look for errors"!
   su -c "$LOCATION/sinusbot" $SINUSBOTUSER
-  
 fi
 
 exit 0
