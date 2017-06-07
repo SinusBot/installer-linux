@@ -62,7 +62,7 @@ function checkInstall {
 # Update notify
 
 cyanMessage "Checking for the latest latest installer version"
-LATEST_VERSION=$(wget -q --timeout=60 -O - https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=Instversion=")([0-9]\.[0-9]\.[0-9]+)')
+LATEST_VERSION=$(wget -q --no-check-certificate --timeout=60 -O - https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=Instversion=")([0-9]\.[0-9]\.[0-9]+)')
 
 if [ "$(printf "${LATEST_VERSION}\n${Instversion}" | sort -V | tail -n 1)" != "$Instversion" ]; then
     errorExit "Outdated installer ${Instversion}. Upgrade your installer to version ${LATEST_VERSION}. Or reuse https://sinusbot-installer.de"
@@ -911,8 +911,12 @@ fi
 
 # Setting server time
 
-timedatectl set-ntp yes
-timedatectl >/dev/null 2>&1
+TEMP_OS_VERSION=$( cat /etc/redhat-release | grep -oE --max-count=1 '([0-9])' | grep -oE '[0-9]' --max-count=1 )
+if [ "$TEMP_OS_VERSION" -ge 7 ]; then
+  timedatectl set-ntp yes
+  timedatectl >/dev/null 2>&1
+fi
+
 
 # Delete files if exists
 
