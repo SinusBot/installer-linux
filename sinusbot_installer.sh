@@ -875,8 +875,14 @@ fi
 
 # Setting server time
 
-timedatectl set-ntp yes
-timedatectl >/dev/null 2>&1
+if [ -f /etc/centos-release ]; then
+  service ntp stop
+  ntpd -s 0.pool.ntp.org
+  service ntp start
+else
+  timedatectl set-ntp yes
+  timedatectl >/dev/null 2>&1
+fi
 
 # Delete files if exists
 
