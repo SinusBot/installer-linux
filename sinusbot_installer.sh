@@ -823,6 +823,7 @@ if [ "$OPTION" == "Yes" ]; then
     rm /usr/local/bin/youtube-dl
   fi
   
+  greenMessage "Downloading YT-DL now..."
   STATUS=$(curl -I http://yt-dl.org/downloads/latest/youtube-dl 2>&1 | grep "HTTP/" | awk '{print $2}')
   if [ "$STATUS" == "302" ]; then
     curl -L -s http://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
@@ -837,6 +838,8 @@ if [ "$OPTION" == "Yes" ]; then
   
   if [ ! -f /usr/local/bin/youtube-dl ]; then
     errorExit "Download failed! Exiting now"!
+  else
+    greenMessage "Download successful"! 
   fi
   
   chmod a+rx /usr/local/bin/youtube-dl
@@ -872,6 +875,8 @@ if [ ! -a "$LOCATION/README_installer.txt" ] && [ $OS != "ubuntu" ]; then
   # #
   ##################################################################################'>>$LOCATION/README_installer.txt
 fi
+
+greenMessage "Generated README_installer.txt"!
 
 # Setting server time
 
