@@ -1,10 +1,6 @@
 #!/bin/bash
 # SinusBot Installer by Philipp Eßwein - DAThosting.eu philipp.esswein@dathosting.eu
 
-# Simple Error Exit
-
-set -o history -o histexpand -e
-
 # Vars
 
 MACHINE=$(uname -m)
@@ -58,6 +54,13 @@ function checkInstall {
     apt-get install -y "$1" 2>/dev/null
   fi
 }
+
+err_report() {
+    redMessage "Error on line $1. Report this to the author."
+    exit 0
+}
+
+trap 'err_report $LINENO' ERR
 
 # Update notify
 
