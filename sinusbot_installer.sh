@@ -563,7 +563,7 @@ magentaMessage "Installing necessary packages! Please wait..."
 
 if [ -f /etc/centos-release ]; then
   yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute which >/dev/null 2>&1
-  update-ca-certificates >/dev/null 2>&1
+  update-ca-trust extract >/dev/null 2>&1
 else
   apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute2 -y >/dev/null 2>&1
   update-ca-certificates >/dev/null 2>&1
