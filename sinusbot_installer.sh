@@ -444,7 +444,9 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       fi
     fi
     
-    rm /etc/cron.d/sinusbot
+    if [ -f /etc/cron.d/sinusbot ]; then
+    	rm /etc/cron.d/sinusbot
+    fi
     
     if [ "$LOCATION" ]; then
       rm -R $LOCATION >/dev/null 2>&1
