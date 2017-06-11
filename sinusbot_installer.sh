@@ -57,7 +57,7 @@ function checkInstall {
 
 err_report() {
     redMessage "Error on line $1. Report this to the author."
-    exit 0
+    exit 1
 }
 
 trap 'err_report $LINENO' ERR
