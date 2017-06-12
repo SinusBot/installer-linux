@@ -571,13 +571,6 @@ else
   update-ca-certificates >/dev/null 2>&1
 fi
 
-if [[ $(dpkg -l locales | awk '{print $1}' | grep "ii") != "ii" ]]; then
-  yellowMessage "Fixing your locales. Setting them to en_US.UTF-8"!
-  apt-get -qq install locales -y >/dev/null 2>&1
-  locale-gen --purge en_US.UTF-8 >/dev/null 2>&1
-  echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale
-fi
-
 greenMessage "Packages installed"!
 
 USERADD=$(which useradd)
@@ -825,7 +818,7 @@ if [ "$OPTION" == "Yes" ]; then
     redMessage "Cronjob already set for YT-DL updater"!
   else
     greenMessage "Installing Cronjob for automatic YT-DL update..."
-    echo "0 0 * * * su $SINUSBOTUSER youtube-dl -U >/dev/null 2>&1">>/etc/cron.d/ytdl
+    echo "0 0 * * * su $SINUSBOTUSER youtube-dl -U --restrict-filename >/dev/null 2>&1">>/etc/cron.d/ytdl
     greenMessage "Installing Cronjob successful."
   fi
   
@@ -856,7 +849,7 @@ if [ "$OPTION" == "Yes" ]; then
   
   chmod a+rx /usr/local/bin/youtube-dl
   
-  youtube-dl -U
+  youtube-dl -U --restrict-filename
   
 fi
 
