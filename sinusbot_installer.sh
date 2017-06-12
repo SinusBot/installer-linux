@@ -56,7 +56,7 @@ function checkInstall {
 }
 
 err_report() {
-    redMessage "Error on line $1. Report this to the author."
+    redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/add-reply only"!
     exit 1
 }
 
