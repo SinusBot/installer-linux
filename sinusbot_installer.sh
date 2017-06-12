@@ -571,6 +571,12 @@ else
   update-ca-certificates >/dev/null 2>&1
 fi
 
+if [ $(dpkg -l locales | grep "ii  locales" | echo $?) != "0" ]; then
+  apt-get -qq install locales -y >/dev/null 2>&1
+  locale-gen --purge en_US.UTF-8 >/dev/null 2>&1
+  echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale
+fi
+
 greenMessage "Packages installed"!
 
 USERADD=$(which useradd)
