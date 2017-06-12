@@ -467,7 +467,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       done
       
       if [ "$OPTION" == "Yes" ]; then
-        pkill -9 -u $(id -u $SINUSBOTUSER)
+        pkill -9 -u $SINUSBOTUSER
         if [ -f /etc/centos-release ]; then
           userdel -f --remove $SINUSBOTUSER >/dev/null 2>&1
         else
