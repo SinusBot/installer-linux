@@ -571,8 +571,7 @@ else
   update-ca-certificates >/dev/null 2>&1
 fi
 
-dpkg -l locales | grep "ii  locales" >/dev/null 2>&1
-if [ $? != 0 ]; then
+if [ $(dpkg -l locales | grep "ii  locales" | echo $?) != "0" ]; then
   yellowMessage "Fixing your locales. Setting them to en_US.UTF-8"!
   apt-get -qq install locales -y >/dev/null 2>&1
   locale-gen --purge en_US.UTF-8 >/dev/null 2>&1
