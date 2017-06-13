@@ -56,7 +56,7 @@ function checkInstall {
 }
 
 err_report() {
-    redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/add-reply only"!
+    redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script."
     exit 1
 }
 
