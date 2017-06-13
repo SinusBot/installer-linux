@@ -48,13 +48,6 @@ function makeDir {
   fi
 }
 
-function checkInstall {
-  if [ "$(dpkg-query -s "$1" 2>/dev/null)" == "" ]; then
-    greenMessage "Installing package $1"
-    apt-get install -y "$1" 2>/dev/null
-  fi
-}
-
 err_report() {
     redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script."
     exit 1
@@ -234,8 +227,8 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     
     if [ -f /etc/debian_version ]; then
       greenMessage "Check if lsb-release and debconf-utils is installed..."
-      checkInstall debconf-utils
-      checkInstall lsb-release
+      apt-get -qq install debconf-utils -y >/dev/null 2>&1
+      apt-get -qq install lsb-release -y >/dev/null 2>&1
       greenMessage "Done"!
     fi
     
@@ -532,7 +525,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     if [ -f /etc/centos-release ]; then
       yum -y -q install curl >/dev/null 2>&1
     else
-      checkInstall curl
+      apt-get -qq install curl -y >/dev/null 2>&1
     fi
   fi
 fi
@@ -681,7 +674,7 @@ else
   if  [ -f /etc/centos-release ]; then
     yum -y -q install wget
   fi
-  checkInstall wget
+  apt-get -qq install wget -y >/dev/null 2>&1
   su -c "wget -q https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2" $SINUSBOTUSER
 fi
 
@@ -724,7 +717,7 @@ if [ $OS != "ubuntu" ]; then
     if  [ -f /etc/centos-release ]; then
       yum -y -q install wget
     fi
-    checkInstall wget
+    apt-get -qq install wget -y >/dev/null 2>&1
     wget -q https://raw.githubusercontent.com/Xuxe/Sinusbot-Startscript/master/sinusbot.service
   fi
   
@@ -753,7 +746,7 @@ if [ $OS != "ubuntu" ]; then
     if  [ -f /etc/centos-release ]; then
       yum -y -q install wget
     fi
-    checkInstall wget
+    apt-get -qq install wget -y >/dev/null 2>&1
     wget -q https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot
   fi
   
@@ -837,7 +830,7 @@ if [ "$OPTION" == "Yes" ]; then
     if [ -f /etc/centos-release ]; then
       yum -y -q install wget
     fi
-    checkInstall wget
+    apt-get -qq install wget -y >/dev/null 2>&1
     wget -q -O /usr/local/bin/youtube-dl http://yt-dl.org/downloads/latest/youtube-dl
   fi
   
