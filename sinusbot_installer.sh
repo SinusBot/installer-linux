@@ -709,16 +709,16 @@ if [ $OS != "ubuntu" ]; then
   cd /lib/systemd/system/
   
   
-  STATUS=$(curl -I https://raw.githubusercontent.com/Xuxe/Sinusbot-Startscript/master/sinusbot.service 2>&1 | grep "HTTP/" | awk '{print $2}')
+  STATUS=$(curl -I https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service 2>&1 | grep "HTTP/" | awk '{print $2}')
   if [ "$STATUS" == "200" ]; then
-    curl -O -s https://raw.githubusercontent.com/Xuxe/Sinusbot-Startscript/master/sinusbot.service
+    curl -O -s https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service
   else
     redMessage "Error while downloading systemd script with cURL. Trying it with wget."
     if  [ -f /etc/centos-release ]; then
       yum -y -q install wget
     fi
     apt-get -qq install wget -y >/dev/null 2>&1
-    wget -q https://raw.githubusercontent.com/Xuxe/Sinusbot-Startscript/master/sinusbot.service
+    wget -q https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service
   fi
   
   if [ ! -f sinusbot.service ]; then
