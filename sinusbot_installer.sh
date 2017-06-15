@@ -879,9 +879,9 @@ greenMessage "Generated README_installer.txt"!
 # Setting server time
 
 if [ -f /etc/centos-release ]; then
-  service ntp stop
+  service ntpd stop
   ntpd -s 0.pool.ntp.org
-  service ntp start
+  service ntpd start
 else
   timedatectl set-ntp yes
   timedatectl >/dev/null 2>&1
