@@ -462,11 +462,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       done
       
       if [ "$OPTION" == "Yes" ]; then
-        if [ -f /etc/centos-release ]; then
-          userdel -f --remove $SINUSBOTUSER >/dev/null 2>&1
-        else
-          deluser -f --remove-home $SINUSBOTUSER >/dev/null 2>&1
-        fi
+       userdel -r -f $SINUSBOTUSER >/dev/null 2>&1
         
         if [ "$(id $SINUSBOTUSER 2> /dev/null)" == "" ]; then
           greenMessage "User removed successfully"!
@@ -493,6 +489,21 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       *) errorContinue;;
     esac
   done
+  
+  # Ask for YT-DL
+  
+  redMessage "Should YT-DL be installed/updated?"
+  OPTIONS=("Yes" "No")
+  select OPTION in "${OPTIONS[@]}"; do
+    case "$REPLY" in
+      1|2 ) break;;
+      *) errorContinue;;
+    esac
+  done
+
+  if [ "$OPTION" == "Yes" ]; then
+    YT="Yes"
+  fi
   
   # Update packages or not
   
@@ -778,8 +789,8 @@ cd $LOCATION
 if [ "$INSTALL" == "Inst" ]; then
   if [[ ! -f $LOCATION/config.ini ]]; then
     echo 'ListenPort = 8087
-			ListenHost = "0.0.0.0"
-			TS3Path = "'$LOCATION'/teamspeak3-client/ts3client_linux_amd64"
+    ListenHost = "0.0.0.0"
+    TS3Path = "'$LOCATION'/teamspeak3-client/ts3client_linux_amd64"
     YoutubeDLPath = ""'>>$LOCATION/config.ini
     greenMessage "Config.ini created successfully."
   else
@@ -797,16 +808,7 @@ fi
 
 # Installing YT-DL.
 
-redMessage "Should YT-DL be installed/updated?"
-OPTIONS=("Yes" "No")
-select OPTION in "${OPTIONS[@]}"; do
-  case "$REPLY" in
-    1|2 ) break;;
-    *) errorContinue;;
-  esac
-done
-
-if [ "$OPTION" == "Yes" ]; then
+if [ "$YT" == "Yes" ]; then
   greenMessage "Installing YT-Downloader now"!
   if [ -f /etc/cron.d/ytdl ] && [ "$(grep -c 'youtube' /etc/cron.d/ytdl)" -ge 1 ]; then
     redMessage "Cronjob already set for YT-DL updater"!
