@@ -49,7 +49,7 @@ function makeDir {
 }
 
 err_report() {
-    redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script."
+    redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script. Or have a look directly to your error: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L"$1
     exit 1
 }
 
@@ -178,11 +178,13 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     yellowMessage "After that change your password under user accounts->admin. The script restart the bot with init.d or systemd."
     
     if [ -f /lib/systemd/system/sinusbot.service ]; then
+      if [[ $(systemctl is-active sinusbot >/dev/null 2>&1 && echo UP || echo DOWN) == "UP" ]]; then
       service sinusbot stop
-    fi
-    
-    if [ -f /etc/init.d/sinusbot ]; then
+      fi
+    elif [ -f /etc/init.d/sinusbot ]; then
+      if [ "$(/etc/init.d/sinusbot status | awk '{print $NF; exit}')" == "UP" ]; then
       /etc/init.d/sinusbot stop
+      fi
     fi
     
     log="/tmp/sinusbot.log"
@@ -460,7 +462,6 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       done
       
       if [ "$OPTION" == "Yes" ]; then
-        pkill -9 -u $SINUSBOTUSER
         if [ -f /etc/centos-release ]; then
           userdel -f --remove $SINUSBOTUSER >/dev/null 2>&1
         else
