@@ -507,7 +507,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
   
   # Update packages or not
   
-  redMessage 'Update the system packages to the latest version? Recommended, as otherwise dependencies might break! Option "No" = Exit'
+  redMessage 'Update the system packages to the latest version? Recommended, as otherwise dependencies might break! Option "No" will exit the installer'
   
   OPTIONS=("Yes" "Try without" "No")
   select OPTION in "${OPTIONS[@]}"; do
