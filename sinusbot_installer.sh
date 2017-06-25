@@ -886,7 +886,7 @@ if [ -f /etc/centos-release ]; then
   ntpd -s 0.pool.ntp.org
   service ntpd start
 else
-  service ntpd start
+  service ntpd restart
   timedatectl set-ntp yes
   timedatectl >/dev/null 2>&1
 fi
