@@ -803,7 +803,7 @@ if [[ -f /etc/cron.d/sinusbot ]]; then
   redMessage "Cronjob already set for SinusBot updater"!
 else
   greenMessage "Installing Cronjob for automatic SinusBot update..."
-  echo "0 0 * * * su $SINUSBOTUSER $LOCATION/sinusbot -update >/dev/null 2>&1">>/etc/cron.d/sinusbot
+  echo "0 0 * * * $SINUSBOTUSER $LOCATION/sinusbot -update >/dev/null 2>&1">>/etc/cron.d/sinusbot
   greenMessage "Installing SinusBot update cronjob successful."
 fi
 
