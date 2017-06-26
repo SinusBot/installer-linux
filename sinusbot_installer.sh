@@ -58,6 +58,7 @@ trap 'err_report $LINENO' ERR
 # Update notify
 
 cyanMessage "Checking for the latest latest installer version"
+apt-get -qq install wget -y
 LATEST_VERSION=$(wget --no-check-certificate --timeout=60 -qO - https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=Instversion=")([0-9]\.[0-9]\.[0-9]+)')
 
 if [ "$(printf "${LATEST_VERSION}\n${Instversion}" | sort -V | tail -n 1)" != "$Instversion" ]; then
