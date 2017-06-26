@@ -793,9 +793,9 @@ if [ "$INSTALL" == "Inst" ]; then
     ListenHost = "0.0.0.0"
     TS3Path = "'$LOCATION'/teamspeak3-client/ts3client_linux_amd64"
     YoutubeDLPath = ""'>>$LOCATION/config.ini
-    greenMessage "Config.ini created successfully."
+    greenMessage "config.ini created successfully."
   else
-    redMessage "Config.ini already exists or creation error"!
+    redMessage "config.ini already exists or creation error"!
   fi
 fi
 
