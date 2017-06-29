@@ -712,6 +712,8 @@ if [ "$INSTALL" == "Inst" ]; then
 fi
 
 if [ $OS != "ubuntu" ]; then
+
+  greenMessage "Starting systemd installation"
   
   if [ -f /etc/systemd/system/sinusbot.service ]; then
     service sinusbot stop
@@ -720,7 +722,6 @@ if [ $OS != "ubuntu" ]; then
   fi
   
   cd /lib/systemd/system/
-  
   
   STATUS=$(curl -I https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service 2>&1 | grep "HTTP/" | awk '{print $2}')
   if [ "$STATUS" == "200" ]; then
@@ -748,6 +749,8 @@ if [ $OS != "ubuntu" ]; then
   greenMessage 'Installed systemd file to start the SinusBot with "service sinusbot {start|stop|status|restart}"'
   
   elif [ $OS == "ubuntu" ]; then
+  
+  greenMessage "Starting init.d installation"
   
   cd /etc/init.d/
   
