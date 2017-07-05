@@ -183,7 +183,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     yellowMessage "After that change your password under user accounts->admin. The script restart the bot with init.d or systemd."
     
     if [ -f /lib/systemd/system/sinusbot.service ]; then
-      if [[ $(systemctl is-active sinusbot >/dev/null 2>&1 && echo UP || echo DOWN) == "UP" ]]; then
+      if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
       service sinusbot stop
       fi
     elif [ -f /etc/init.d/sinusbot ]; then
@@ -195,7 +195,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     log="/tmp/sinusbot.log"
     match="USER-PATCH [admin] (admin) OK"
     
-    su -c "$LOCATIONex --pwreset=$PW" $SINUSBOTUSER > "$log" 2>&1 &
+    su -c "$LOCATIONex --pwreset=$PW" $SINUSBOTUSER > "$log" &
     sleep 3
     
     while true; do
@@ -234,8 +234,8 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     
     if [ -f /etc/debian_version ]; then
       greenMessage "Check if lsb-release and debconf-utils is installed..."
-      apt-get -qq install debconf-utils -y >/dev/null 2>&1
-      apt-get -qq install lsb-release -y >/dev/null 2>&1
+      apt-get -qq install debconf-utils -y >/dev/null
+      apt-get -qq install lsb-release -y >/dev/null
       greenMessage "Done"!
     fi
     
@@ -426,7 +426,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     fi
     
     if [ -f /lib/systemd/system/sinusbot.service ] && [ "$OS" != "ubuntu" ]; then
-      if [[ $(systemctl is-active sinusbot >/dev/null 2>&1 && echo UP || echo DOWN) == "UP" ]]; then
+      if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
         service sinusbot stop 2> /dev/null
         systemctl disable sinusbot 2> /dev/null
         rm /lib/systemd/system/sinusbot.service
@@ -437,7 +437,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       if [ "$(/etc/init.d/sinusbot status | awk '{print $NF; exit}')" == "UP" ]; then
         su -c "/etc/init.d/sinusbot stop" $SINUSBOTUSER
         su -c "screen -wipe" $SINUSBOTUSER
-        update-rc.d -f sinusbot remove >/dev/null 2>&1
+        update-rc.d -f sinusbot remove >/dev/null
         rm /etc/init.d/sinusbot
       else
         rm /etc/init.d/sinusbot
@@ -449,7 +449,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     fi
     
     if [ "$LOCATION" ]; then
-      rm -R $LOCATION >/dev/null 2>&1
+      rm -R $LOCATION >/dev/null
       greenMessage "Files removed successfully"!
     else
       redMessage "Error while removing files."
@@ -467,7 +467,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       done
       
       if [ "$OPTION" == "Yes" ]; then
-       userdel -r -f $SINUSBOTUSER >/dev/null 2>&1
+       userdel -r -f $SINUSBOTUSER >/dev/null
         
         if [ "$(id $SINUSBOTUSER 2> /dev/null)" == "" ]; then
           greenMessage "User removed successfully"!
@@ -533,16 +533,16 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     sleep 3
     
     if [ -f /etc/centos-release ]; then
-      yum -y -q update && yum -y -q install curl >/dev/null 2>&1
+      yum -y -q update && yum -y -q install curl >/dev/null
     else
-      apt-get -qq update && apt-get -qq upgrade -y && apt-get -qq install curl -y >/dev/null 2>&1
+      apt-get -qq update && apt-get -qq upgrade -y && apt-get -qq install curl -y >/dev/null
     fi
     
     elif [ "$OPTION" == "Try without" ]; then
     if [ -f /etc/centos-release ]; then
-      yum -y -q install curl >/dev/null 2>&1
+      yum -y -q install curl >/dev/null
     else
-      apt-get -qq install curl -y >/dev/null 2>&1
+      apt-get -qq install curl -y >/dev/null
     fi
   fi
 fi
@@ -574,11 +574,11 @@ VERSION="3.0.19.4"
 magentaMessage "Installing necessary packages! Please wait..."
 
 if [ -f /etc/centos-release ]; then
-  yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute which dbus >/dev/null 2>&1
-  update-ca-trust extract >/dev/null 2>&1
+  yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute which dbus >/dev/null
+  update-ca-trust extract >/dev/null
 else
-  apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute2 dbus -y >/dev/null 2>&1
-  update-ca-certificates >/dev/null 2>&1
+  apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute2 dbus -y >/dev/null
+  update-ca-certificates >/dev/null
 fi
 
 greenMessage "Packages installed"!
@@ -691,7 +691,7 @@ else
   if  [ -f /etc/centos-release ]; then
     yum -y -q install wget
   fi
-  apt-get -qq install wget -y >/dev/null 2>&1
+  apt-get -qq install wget -y >/dev/null
   su -c "wget -q https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2" $SINUSBOTUSER
 fi
 
@@ -735,7 +735,7 @@ if [ $OS != "ubuntu" ]; then
     if  [ -f /etc/centos-release ]; then
       yum -y -q install wget
     fi
-    apt-get -qq install wget -y >/dev/null 2>&1
+    apt-get -qq install wget -y >/dev/null
     wget -q https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service
   fi
   
@@ -766,7 +766,7 @@ if [ $OS != "ubuntu" ]; then
     if  [ -f /etc/centos-release ]; then
       yum -y -q install wget
     fi
-    apt-get -qq install wget -y >/dev/null 2>&1
+    apt-get -qq install wget -y >/dev/null
     wget -q https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot
   fi
   
@@ -781,10 +781,10 @@ if [ $OS != "ubuntu" ]; then
   chmod +x /etc/init.d/sinusbot
   
   if [ -f /etc/centos-release ]; then
-    chkconfig sinusbot on >/dev/null 2>&1
+    chkconfig sinusbot on >/dev/null
     
   else
-    update-rc.d sinusbot defaults >/dev/null 2>&1
+    update-rc.d sinusbot defaults >/dev/null
   fi
   
   greenMessage 'Installed init.d file to start the SinusBot with "/etc/init.d/sinusbot {start|stop|status|restart|console|update|backup}"'
@@ -810,7 +810,7 @@ if [[ -f /etc/cron.d/sinusbot ]]; then
   redMessage "Cronjob already set for SinusBot updater"!
 else
   greenMessage "Installing Cronjob for automatic SinusBot update..."
-  echo "0 0 * * * $SINUSBOTUSER $LOCATION/sinusbot -update >/dev/null 2>&1">>/etc/cron.d/sinusbot
+  echo "0 0 * * * $SINUSBOTUSER $LOCATION/sinusbot -update >/dev/null">>/etc/cron.d/sinusbot
   greenMessage "Installing SinusBot update cronjob successful."
 fi
 
@@ -822,7 +822,7 @@ if [ "$YT" == "Yes" ]; then
     redMessage "Cronjob already set for YT-DL updater"!
   else
     greenMessage "Installing Cronjob for automatic YT-DL update..."
-    echo "0 0 * * * $SINUSBOTUSER youtube-dl -U --restrict-filename >/dev/null 2>&1">>/etc/cron.d/ytdl
+    echo "0 0 * * * $SINUSBOTUSER youtube-dl -U --restrict-filename >/dev/null">>/etc/cron.d/ytdl
     greenMessage "Installing Cronjob successful."
   fi
   
@@ -841,7 +841,7 @@ if [ "$YT" == "Yes" ]; then
     if [ -f /etc/centos-release ]; then
       yum -y -q install wget
     fi
-    apt-get -qq install wget -y >/dev/null 2>&1
+    apt-get -qq install wget -y >/dev/null
     wget -q -O /usr/local/bin/youtube-dl http://yt-dl.org/downloads/latest/youtube-dl
   fi
   
@@ -896,7 +896,7 @@ if [ -f /etc/centos-release ]; then
 else
   service ntp restart
   timedatectl set-ntp yes
-  timedatectl >/dev/null 2>&1
+  timedatectl >/dev/null
 fi
 
 # Delete files if exists
@@ -949,14 +949,14 @@ fi
 if [ -f /etc/centos-release ] ; then
   if rpm -q --quiet firewalld; then
     zone=$(firewall-cmd --get-active-zones | awk '{print $1; exit}')
-    firewall-cmd --zone=$zone --add-port=8087/tcp --permanent >/dev/null 2>&1
-    firewall-cmd --reload >/dev/null 2>&1
+    firewall-cmd --zone=$zone --add-port=8087/tcp --permanent >/dev/null
+    firewall-cmd --reload >/dev/null
   fi
 fi
 
 # If startup failed, the script will start normal sinusbot without screen for looking about errors. If startup successed => installation done.
 
-if [[ ( $(systemctl is-active sinusbot >/dev/null 2>&1 && echo UP || echo DOWN) == "UP" && $OS != "ubuntu" ) || ( $(/etc/init.d/sinusbot status | awk '{print $NF; exit}') == "UP" && $OS == "ubuntu" ) ]]; then
+if [[ ( $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" && $OS != "ubuntu" ) || ( $(/etc/init.d/sinusbot status | awk '{print $NF; exit}') == "UP" && $OS == "ubuntu" ) ]]; then
   
   if [[ $INSTALL == "Inst" ]]; then
     greenMessage "Install done"!
