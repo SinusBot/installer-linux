@@ -553,7 +553,7 @@ fi
 
 # for VERSION in ` curl -s http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1`; do
 #   DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
-#   STATUS=`curl -I $DOWNLOAD_URL_VERSION | grep "HTTP/" | awk '{print $2}'`
+#   STATUS=`curl -I $DOWNLOAD_URL_VERSION 2>&1 | grep "HTTP/" | awk '{print $2}'`
 #   if [ "$STATUS" == "200" ]; then
 #     DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
 #     break
@@ -683,7 +683,7 @@ cd $LOCATION
 
 greenMessage "Downloading latest SinusBot."
 
-STATUS=$(curl -I https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2 | grep "HTTP/" | awk '{print $2}')
+STATUS=$(curl -I https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2 2>&1 | grep "HTTP/" | awk '{print $2}')
 if [ "$STATUS" == "200" ]; then
   su -c "curl -O -s https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2" $SINUSBOTUSER
 else
@@ -727,7 +727,7 @@ if [ $OS != "ubuntu" ]; then
   
   cd /lib/systemd/system/
   
-  STATUS=$(curl -I https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service | grep "HTTP/" | awk '{print $2}')
+  STATUS=$(curl -I https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service 2>&1 | grep "HTTP/" | awk '{print $2}')
   if [ "$STATUS" == "200" ]; then
     curl -O -s https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service
   else
@@ -758,7 +758,7 @@ if [ $OS != "ubuntu" ]; then
   
   cd /etc/init.d/
   
-  STATUS=$(curl -I https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot | grep "HTTP/" | awk '{print $2}')
+  STATUS=$(curl -I https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot 2>&1 | grep "HTTP/" | awk '{print $2}')
   if [ "$STATUS" == "200" ]; then
     curl -O -s https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot
   else
@@ -833,7 +833,7 @@ if [ "$YT" == "Yes" ]; then
   fi
   
   greenMessage "Downloading YT-DL now..."
-  STATUS=$(curl -I http://yt-dl.org/downloads/latest/youtube-dl | grep "HTTP/" | awk '{print $2}')
+  STATUS=$(curl -I http://yt-dl.org/downloads/latest/youtube-dl 2>&1 | grep "HTTP/" | awk '{print $2}')
   if [ "$STATUS" == "302" ]; then
     curl -L -s http://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
   else
