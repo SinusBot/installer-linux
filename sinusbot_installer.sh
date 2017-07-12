@@ -266,18 +266,12 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
   fi
   
   if [ "$OS" != "ubuntu" ] && [ "$INSTALL" != "Rem" ]; then
-    yellowMessage "Which start script should be used? system.d is prefered since Debian 8."
-    OPTIONS=("system.d" "init.d")
-    select OPTION in "${OPTIONS[@]}"; do
-      case "$REPLY" in
-        1|2 ) break;;
-        *) errorContinue;;
-      esac
-    done
-    
-    if [ "$OPTION" == "init.d" ]; then
-      OS="ubuntu"
-    fi
+
+  if [ -d /usr/lib/systemd ]; then
+    yellowMessage "Automatically chosen system.d for your startscript"!
+  else
+    OS="ubuntu"
+    yellowMessage "Automatically chosen init.d for your startscript"!
   fi
   
   # Set path or continue with normal
@@ -894,9 +888,22 @@ if [ -f /etc/centos-release ]; then
   ntpd -s 0.pool.ntp.org
   service ntpd start
 else
+  if [ $OS != "ubuntu" ]; then
   service ntp restart
   timedatectl set-ntp yes
   timedatectl >/dev/null
+  elif [ $OS == "ubuntu" ]; then
+  redMessage "Can't set your date automatically. Please follow the following steps:"
+  read -rp "Day    (1-32): " DAY
+  read -rp "Month  (1-12): " MONTH
+  read -rp "Year   (2017): " YEAR
+  read -rp "Hour   (0-23): " HOUR
+  read -rp "Minute (0-60): " MINUTE
+  read -rp "Second (0-60):" SECOND
+  date +%d%m%Y -s "$DAY$MONTH$YEAR"
+  date +%T -s "$HOUR:$MINUTE:$SECOND"
+  hwclock -w
+  fi
 fi
 
 # Delete files if exists
