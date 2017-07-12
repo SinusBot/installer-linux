@@ -4,7 +4,7 @@
 # Vars
 
 MACHINE=$(uname -m)
-Instversion="1.3.9"
+Instversion="1.3.10"
 
 # Functions
 
@@ -272,6 +272,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
   else
     OS="ubuntu"
     yellowMessage "Automatically chosen init.d for your startscript"!
+  fi
   fi
   
   # Set path or continue with normal
