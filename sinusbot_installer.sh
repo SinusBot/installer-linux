@@ -566,7 +566,7 @@ VERSION="3.0.19.4"
 
 # Install necessary aptitudes for sinusbot.
 
-magentaMessage "Installing necessary packages! Please wait..."
+magentaMessage "Installing necessary packages. Please wait..."
 
 if [ -f /etc/centos-release ]; then
   yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute which dbus >/dev/null
