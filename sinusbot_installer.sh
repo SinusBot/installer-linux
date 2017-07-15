@@ -900,8 +900,8 @@ else
   read -rp "Year   (2017): " YEAR
   read -rp "Hour   (0-23): " HOUR
   read -rp "Minute (0-60): " MINUTE
-  read -rp "Second (0-60):" SECOND
-  date +%d%m%Y -s "$DAY$MONTH$YEAR"
+  read -rp "Second (0-60): " SECOND
+  date +%Y%m%d -s "$YEAR$MONTH$DAY"
   date +%T -s "$HOUR:$MINUTE:$SECOND"
   hwclock -w
   fi
