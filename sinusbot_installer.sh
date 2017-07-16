@@ -895,12 +895,12 @@ else
   timedatectl >/dev/null
   elif [ $OS == "ubuntu" ]; then
   redMessage "Can't set your date automatically. Please follow the following steps:"
-  read -rp "Day    (1-32): " DAY
-  read -rp "Month  (1-12): " MONTH
-  read -rp "Year   (2017): " YEAR
-  read -rp "Hour   (0-23): " HOUR
-  read -rp "Minute (0-60): " MINUTE
-  read -rp "Second (0-60): " SECOND
+  read -rp "Day    (01-32): " DAY
+  read -rp "Month  (01-12): " MONTH
+  read -rp "Year   (2017):  " YEAR
+  read -rp "Hour   (0-23):  " HOUR
+  read -rp "Minute (0-60):  " MINUTE
+  read -rp "Second (0-60):  " SECOND
   date +%Y%m%d -s "$YEAR$MONTH$DAY"
   date +%T -s "$HOUR:$MINUTE:$SECOND"
   hwclock -w
