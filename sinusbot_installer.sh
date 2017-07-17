@@ -898,11 +898,44 @@ else
   read -rp "Day    (01-32): " DAY
   read -rp "Month  (01-12): " MONTH
   read -rp "Year   (2017):  " YEAR
-  read -rp "Hour   (0-23):  " HOUR
-  read -rp "Minute (0-60):  " MINUTE
-  read -rp "Second (0-60):  " SECOND
+  
+  redMessage "Choose your time format:"
+  OPTIONS=("12 hour" "24 hour")
+  select OPTION in "${OPTIONS[@]}"; do
+    case "$REPLY" in
+      1|2 ) break;;
+      *) errorContinue;;
+    esac
+  done
+  
+  if [ $OPTION == "12 hour" ]; then
+    redMessage "AM or PM?"
+      OPTIONS=("AM" "PM")
+       select OPTION in "${OPTIONS[@]}"; do
+       case "$REPLY" in
+       1|2 ) break;;
+       *) errorContinue;;
+     esac
+     done
+     
+     if [ $OPTION == "AM" ]; then
+       AMPM=AM
+     elif [ $OPTION == "PM" ]; then
+       AMPM=PM
+     fi
+     
+    read -rp "Hour   (1-12):  " HOUR
+    read -rp "Minute (0-59):  " MINUTE
+    read -rp "Second (0-59):  " SECOND
+    date +%T%P -s "$HOUR:$MINUTE:$SECOND$AMPM"
+  elif [ $OPTION == "24 hour" ]; then
+    read -rp "Hour   (1-24):  " HOUR
+    read -rp "Minute (0-59):  " MINUTE
+    read -rp "Second (0-59):  " SECOND
+    date +%T -s "$HOUR:$MINUTE:$SECOND"
+  fi
+  
   date +%Y%m%d -s "$YEAR$MONTH$DAY"
-  date +%T -s "$HOUR:$MINUTE:$SECOND"
   hwclock -w
   fi
 fi
