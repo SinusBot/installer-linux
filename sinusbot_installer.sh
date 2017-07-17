@@ -908,7 +908,7 @@ else
     esac
   done
   
-  if [ $OPTION == "12 hour" ]; then
+  if [ "$OPTION" == "12 hour" ]; then
     redMessage "AM or PM?"
       OPTIONS=("AM" "PM")
        select OPTION in "${OPTIONS[@]}"; do
@@ -918,9 +918,9 @@ else
      esac
      done
      
-     if [ $OPTION == "AM" ]; then
+     if [ "$OPTION" == "AM" ]; then
        AMPM=AM
-     elif [ $OPTION == "PM" ]; then
+     elif [ "$OPTION" == "PM" ]; then
        AMPM=PM
      fi
      
@@ -928,7 +928,7 @@ else
     read -rp "Minute (0-59):  " MINUTE
     read -rp "Second (0-59):  " SECOND
     date +%T%P -s "$HOUR:$MINUTE:$SECOND$AMPM"
-  elif [ $OPTION == "24 hour" ]; then
+  elif [ "$OPTION" == "24 hour" ]; then
     read -rp "Hour   (1-24):  " HOUR
     read -rp "Minute (0-59):  " MINUTE
     read -rp "Second (0-59):  " SECOND
