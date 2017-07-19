@@ -533,6 +533,7 @@ else
   service ntp restart
   timedatectl set-ntp yes
   timedatectl >/dev/null
+  greenMessage "Automatic time set"!
   elif [ $OS == "ubuntu" ]; then
   redMessage "Can't set your date automatically. Please follow the following steps:"
   read -rp "Day    (01-32): " DAY
