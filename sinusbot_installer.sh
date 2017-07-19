@@ -354,7 +354,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     fi
     
     elif [ "$INSTALL" == "Rem" ] || [ "$INSTALL" == "Updt" ]; then
-    if [[ ! $LOCATION ]]; then
+    if [ ! -d $LOCATION ]; then
       errorExit "SinusBot isn't installed"!
     else
       greenMessage "SinusBot is installed. Installer goes on."
