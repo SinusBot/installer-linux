@@ -195,7 +195,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     log="/tmp/sinusbot.log"
     match="USER-PATCH [admin] (admin) OK"
     
-    su -c "$LOCATIONex --pwreset=$PW" $SINUSBOTUSER > "$log" &
+    su -c "$LOCATIONex --pwreset=$PW" $SINUSBOTUSER > "$log" 2>&1 &
     sleep 3
     
     while true; do
