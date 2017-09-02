@@ -991,7 +991,7 @@ if [ "$INSTALL" != "Updt" ]; then
   chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
   
   # Starting bot
-  greenMessage "Starting SinusBot again. Your admin password = '$password'"
+  greenMessage "Starting SinusBot again."
 fi
 
 if [ $OS != "ubuntu" ]; then
