@@ -63,7 +63,7 @@ if [ -f /etc/centos-release ]; then
 else
   apt-get -qq install wget -y
   wget http://ftp.de.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
-  apt-get -qq install virt-what_1.14-1_amd64.deb
+  apt-get -qq install ./virt-what_1.14-1_amd64.deb
   rm virt-what_1.14-1_amd64.deb
   
   if [ $(virt-what) == "openvz" ]; then
