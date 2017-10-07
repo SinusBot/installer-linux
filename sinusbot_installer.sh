@@ -61,7 +61,17 @@ cyanMessage "Checking for the latest latest installer version"
 if [ -f /etc/centos-release ]; then
   yum -y -q install wget virt-what
 else
-  apt-get -qq install wget virt-what -y
+  apt-get -qq install wget -y
+  wget http://ftp.de.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
+  apt-get -qq install virt-what_1.14-1_amd64.deb
+  rm virt-what_1.14-1_amd64.deb
+  
+  if [ $(virt-what) == "openvz" ]; then
+    redMessage "Warning, your server running under OpenVZ! This is an very old container system and isn't well supported by newer packages."
+  elif [ $(virt-what) == "docker" ]; then
+    redMessage "Warning, your server running under Docker! Maybe there are failures while installing."
+  fi
+  
 fi
 LATEST_VERSION=$(wget --no-check-certificate --timeout=60 -qO - https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=Instversion=")([0-9]\.[0-9]\.[0-9]+)')
 
