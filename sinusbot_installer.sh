@@ -63,12 +63,12 @@ if [ -f /etc/centos-release ]; then
 else
   apt-get -qq install wget -y
   wget http://ftp.de.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
-  apt-get -qq install ./virt-what_1.14-1_amd64.deb
+  dpkg -i ./virt-what_1.14-1_amd64.deb
   rm virt-what_1.14-1_amd64.deb
   
-  if [ $(virt-what) == "openvz" ]; then
+  if [ $(virt-what | grep "openvz") ]; then
     redMessage "Warning, your server running under OpenVZ! This is an very old container system and isn't well supported by newer packages."
-  elif [ $(virt-what) == "docker" ]; then
+  elif [ $(virt-what | grep "docker") ]; then
     redMessage "Warning, your server running under Docker! Maybe there are failures while installing."
   fi
   
@@ -517,7 +517,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
   
   # Setting server time
  
-  if [ $(virt-what) == "openvz" ]; then
+  if [ $(virt-what | grep "openvz") ]; then
     redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
   else
   yellowMessage "Check your time below:"
