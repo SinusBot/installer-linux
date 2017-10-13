@@ -62,9 +62,11 @@ if [ -f /etc/centos-release ]; then
   yum -y -q install wget virt-what
 else
   apt-get -qq install wget -y
-  wget http://ftp.de.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
-  dpkg -i ./virt-what_1.14-1_amd64.deb
-  rm virt-what_1.14-1_amd64.deb
+  if [ $(dpkg-query -W -f='${Status}\n' virt-what) != "install ok installed" ];
+    wget http://ftp.de.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
+    dpkg -i ./virt-what_1.14-1_amd64.deb
+    rm virt-what_1.14-1_amd64.deb
+  fi
   
   if [ $(virt-what | grep "openvz") ]; then
     redMessage "Warning, your server running under OpenVZ! This is an very old container system and isn't well supported by newer packages."
