@@ -59,11 +59,11 @@ trap 'err_report $LINENO' ERR
 
 cyanMessage "Checking for the latest latest installer version"
 if [ -f /etc/centos-release ]; then
-  yum -y -q install wget virt-what
+  yum -y -q install virt-what
 else
   apt-get -qq install wget -y
   if [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
-    wget http://ftp.de.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
+    wget -q http://ftp.de.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
     dpkg -i ./virt-what_1.14-1_amd64.deb
     rm virt-what_1.14-1_amd64.deb
   fi
