@@ -62,7 +62,7 @@ if [ -f /etc/centos-release ]; then
   yum -y -q install wget virt-what
 else
   apt-get -qq install wget -y
-  if [ $(dpkg-query -W -f='${Status}\n' virt-what 2>/dev/null && echo "installed" || echo "not installed") == "not installed" ]; then
+  if [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
     wget http://ftp.de.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
     dpkg -i ./virt-what_1.14-1_amd64.deb
     rm virt-what_1.14-1_amd64.deb
