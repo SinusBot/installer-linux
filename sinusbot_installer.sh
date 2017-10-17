@@ -61,19 +61,7 @@ cyanMessage "Checking for the latest latest installer version"
 if [ -f /etc/centos-release ]; then
   yum -y -q install virt-what
 else
-  apt-get -qq install wget -y
-  if [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
-    wget -q http://ftp.de.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
-    dpkg -i ./virt-what_1.14-1_amd64.deb
-    rm virt-what_1.14-1_amd64.deb
-  fi
-  
-  if [ $(virt-what | grep "openvz") ]; then
-    redMessage "Warning, your server running under OpenVZ! This is an very old container system and isn't well supported by newer packages."
-  elif [ $(virt-what | grep "docker") ]; then
-    redMessage "Warning, your server running under Docker! Maybe there are failures while installing."
-  fi
-  
+  apt-get -qq install wget -y  
 fi
 LATEST_VERSION=$(wget --no-check-certificate --timeout=60 -qO - https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=Instversion=")([0-9]\.[0-9]\.[0-9]+)')
 
@@ -255,6 +243,23 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     
     OS=$(lsb_release -i 2> /dev/null | grep 'Distributor' | awk '{print tolower($3)}')
     OSBRANCH=$(lsb_release -c 2> /dev/null | grep 'Codename' | awk '{print $2}')
+    
+    if [ $OS == "debian" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
+        wget -q http://ftp.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
+        dpkg -i ./virt-what_1.14-1_amd64.deb
+        rm virt-what_1.14-1_amd64.deb
+    elif [ $OS == "ubuntu" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
+        wget -q http://de.archive.ubuntu.com/ubuntu/pool/universe/v/virt-what/virt-what_1.13-1_amd64.deb
+        dpkg -i ./virt-what_1.13-1_amd64.deb
+        rm virt-what_1.13-1_amd64.deb
+    fi
+    
+    if [ $(virt-what | grep "openvz") ]; then
+      redMessage "Warning, your server running under OpenVZ! This is an very old container system and isn't well supported by newer packages."
+    elif [ $(virt-what | grep "docker") ]; then
+      redMessage "Warning, your server running under Docker! Maybe there are failures while installing."
+    fi
+        
   fi
   
   # Go on
