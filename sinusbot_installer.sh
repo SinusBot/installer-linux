@@ -656,8 +656,8 @@ fi
 #   errorExit "Could not detect latest TS3-Client version"
 # fi
 
-DOWNLOAD_URL="http://ftp.4players.de/pub/hosted/ts3/releases/3.0.19.4/TeamSpeak3-Client-linux_amd64-3.0.19.4.run"
-VERSION="3.0.19.4"
+DOWNLOAD_URL="http://ftp.4players.de/pub/hosted/ts3/releases/3.0.18.2/TeamSpeak3-Client-linux_amd64-3.0.18.2.run"
+VERSION="3.0.18.2"
 
 # Install necessary aptitudes for sinusbot.
 
