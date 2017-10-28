@@ -230,6 +230,23 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       greenMessage "Installing redhat-lsb! Please wait."
       yum -y -q install redhat-lsb
       greenMessage "Done"!
+	  
+	  yellowMessage "You're running CentOS. Which firewallsystem you're using?"
+	  
+	  OPTIONS=("IPtables" "Firewalld")
+      select OPTION in "${OPTIONS[@]}"; do
+        case "$REPLY" in
+          1|2 ) break;;
+          *) errorContinue;;
+        esac
+      done
+	  
+	  if [ "$OPTION" == "IPtables" ]; then
+	    FIREWALL="ip"
+	  elif [ "$OPTION" == "Firewalld" ]; then
+	    FIREWALL="fd"
+	  fi
+	  
     fi
     
     if [ -f /etc/debian_version ]; then
@@ -1027,10 +1044,15 @@ if [ $OS != "ubuntu" ]; then
 fi
 
 if [ -f /etc/centos-release ] ; then
-  if rpm -q --quiet firewalld; then
-    zone=$(firewall-cmd --get-active-zones | awk '{print $1; exit}')
-    firewall-cmd --zone=$zone --add-port=8087/tcp --permanent >/dev/null
-    firewall-cmd --reload >/dev/null
+
+  if [ "$FIREWALL" == "ip" ]; then
+    iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 8087 -j ACCEPT
+  elif [ "$FIREWALL" == "fs" ]; then
+    if rpm -q --quiet firewalld; then
+      zone=$(firewall-cmd --get-active-zones | awk '{print $1; exit}')
+      firewall-cmd --zone=$zone --add-port=8087/tcp --permanent >/dev/null
+      firewall-cmd --reload >/dev/null
+    fi
   fi
 fi
 
