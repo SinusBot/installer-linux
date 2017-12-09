@@ -4,28 +4,28 @@
 # Vars
 
 MACHINE=$(uname -m)
-Instversion="1.3.10"
+Instversion="1.4"
 
 # Functions
 
 function greenMessage {
-  echo -e "\\033[32;1m${*}\033[0m"
+  echo -e "\\033[32;1m${*}\\033[0m"
 }
 
 function magentaMessage {
-  echo -e "\\033[35;1m${*}\033[0m"
+  echo -e "\\033[35;1m${*}\\033[0m"
 }
 
 function cyanMessage {
-  echo -e "\\033[36;1m${*}\033[0m"
+  echo -e "\\033[36;1m${*}\\033[0m"
 }
 
 function redMessage {
-  echo -e "\\033[31;1m${*}\033[0m"
+  echo -e "\\033[31;1m${*}\\033[0m"
 }
 
 function yellowMessage {
-  echo -e "\\033[33;1m${*}\033[0m"
+  echo -e "\\033[33;1m${*}\\033[0m"
 }
 
 function errorQuit {
@@ -49,7 +49,7 @@ function makeDir {
 }
 
 err_report() {
-    redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script. Or have a look directly to your error: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L"$1
+    redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script. Or have a look directly to your error: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L""$1"
     exit 1
 }
 
@@ -65,7 +65,7 @@ else
 fi
 LATEST_VERSION=$(wget --no-check-certificate --timeout=60 -qO - https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=Instversion=")([0-9]\.[0-9]\.[0-9]+)')
 
-if [ "$(printf "${LATEST_VERSION}\n${Instversion}" | sort -V | tail -n 1)" != "$Instversion" ]; then
+if [ "$(printf "${LATEST_VERSION}\\n${Instversion}" | sort -V | tail -n 1)" != "$Instversion" ]; then
   errorExit "Outdated installer ${Instversion}. Upgrade your installer to version ${LATEST_VERSION}. Or reuse https://sinusbot-installer.de"
 else
   greenMessage "Your installer is up-to-date."
@@ -75,12 +75,7 @@ fi
 # Must be root. Checking...
 
 if [ "$(id -u)" != "0" ]; then
-  cyanMessage "Change to root account required"
-  su root
-fi
-
-if [ "$(id -u)" != "0" ]; then
-  errorExit "Still not root, aborting"
+  errorExit "Change to root account required!"
 fi
 
 # Start installer
@@ -195,7 +190,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     log="/tmp/sinusbot.log"
     match="USER-PATCH [admin] (admin) OK"
     
-    su -c "$LOCATIONex --pwreset=$PW" $SINUSBOTUSER > "$log" 2>&1 &
+    su -c "$LOCATIONex --override-password $PW" $SINUSBOTUSER > "$log" 2>&1 &
     sleep 3
     
     while true; do
@@ -246,7 +241,6 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
 	  elif [ "$OPTION" == "Firewalld" ]; then
 	    FIREWALL="fd"
 	  fi
-	  
     fi
     
     if [ -f /etc/debian_version ]; then
@@ -262,12 +256,10 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     OSBRANCH=$(lsb_release -c 2> /dev/null | grep 'Codename' | awk '{print $2}')
     
     if [ $OS == "debian" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
-        apt-get -qq install dmidecode -y >/dev/null
         wget -q http://ftp.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
         dpkg -i ./virt-what_1.14-1_amd64.deb
         rm virt-what_1.14-1_amd64.deb
     elif [ $OS == "ubuntu" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
-        apt-get -qq install dmidecode -y >/dev/null 
         wget -q http://de.archive.ubuntu.com/ubuntu/pool/universe/v/virt-what/virt-what_1.13-1_amd64.deb
         dpkg -i ./virt-what_1.13-1_amd64.deb
         rm virt-what_1.13-1_amd64.deb
@@ -658,35 +650,35 @@ fi
 
 # TeamSpeak3-Client latest check || Deactivated till botupdate
 
-# greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
+greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-# for VERSION in ` curl -s http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1`; do
-#   DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
-#   STATUS=`curl -I $DOWNLOAD_URL_VERSION 2>&1 | grep "HTTP/" | awk '{print $2}'`
-#   if [ "$STATUS" == "200" ]; then
-#     DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
-#     break
-#   fi
-# done
+for VERSION in ` curl -s http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1`; do
+  DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
+  STATUS=`curl -I $DOWNLOAD_URL_VERSION 2>&1 | grep "HTTP/" | awk '{print $2}'`
+  if [ "$STATUS" == "200" ]; then
+    DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
+    break
+  fi
+done
 
-# if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
-#   greenMessage "Detected latest TS3-Client version as $VERSION with download URL $DOWNLOAD_URL"
-# else
-#   errorExit "Could not detect latest TS3-Client version"
-# fi
+if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
+  greenMessage "Detected latest TS3-Client version as $VERSION"
+else
+  errorExit "Could not detect latest TS3-Client version"
+fi
 
-DOWNLOAD_URL="http://ftp.4players.de/pub/hosted/ts3/releases/3.0.18.2/TeamSpeak3-Client-linux_amd64-3.0.18.2.run"
-VERSION="3.0.18.2"
+#DOWNLOAD_URL="http://ftp.4players.de/pub/hosted/ts3/releases/3.1.4/TeamSpeak3-Client-linux_amd64-3.1.4.run"
+#VERSION="3.1.4"
 
 # Install necessary aptitudes for sinusbot.
 
 magentaMessage "Installing necessary packages. Please wait..."
 
 if [ -f /etc/centos-release ]; then
-  yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute which dbus >/dev/null
+  yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 >/dev/null
   update-ca-trust extract >/dev/null
 else
-  apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute2 dbus -y >/dev/null
+  apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 -y >/dev/null
   update-ca-certificates >/dev/null
 fi
 
@@ -792,29 +784,37 @@ cd $LOCATION
 
 greenMessage "Downloading latest SinusBot."
 
-STATUS=$(curl -I https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2 2>&1 | grep "HTTP/" | awk '{print $2}')
+STATUS=$(curl -I https://www.sinusbot.com/dl/sinusbot.current.tar.bz2 2>&1 | grep "HTTP/" | awk '{print $2}')
 if [ "$STATUS" == "200" ]; then
-  su -c "curl -O -s https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2" $SINUSBOTUSER
+  su -c "curl -O -s https://www.sinusbot.com/dl/sinusbot.current.tar.bz2" $SINUSBOTUSER
 else
   redMessage "Error while downloading with cURL (Status = $STATUS). Trying it with wget."
   if  [ -f /etc/centos-release ]; then
     yum -y -q install wget
   fi
   apt-get -qq install wget -y >/dev/null
-  su -c "wget -q https://www.sinusbot.com/dl/sinusbot-beta.tar.bz2" $SINUSBOTUSER
+  su -c "wget -q https://www.sinusbot.com/dl/sinusbot.current.tar.bz2" $SINUSBOTUSER
 fi
 
-if [[ ! -f sinusbot-beta.tar.bz2 && ! -f sinusbot ]]; then
+if [[ ! -f sinusbot.current.tar.bz2 && ! -f sinusbot ]]; then
   errorExit "Download failed! Exiting now"!
 fi
 
 # Installing latest SinusBot.
 
 greenMessage "Extracting SinusBot files."
-su -c "tar -xjf sinusbot-beta.tar.bz2" $SINUSBOTUSER
-rm -f sinusbot-beta.tar.bz2
+su -c "tar -xjf sinusbot.current.tar.bz2" $SINUSBOTUSER
+rm -f sinusbot.current.tar.bz2
+
+if [ ! -d teamspeak3-client/plugins/ ]; then
+  mkdir teamspeak3-client/plugins/
+fi
 
 cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
+
+if [ -f teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so ]; then
+  rm teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so
+fi
 
 chmod 755 sinusbot
 
@@ -1003,7 +1003,7 @@ if [ -f /tmp/.sinusbot.lock ]; then
   greenMessage "Deleted /tmp/.sinusbot.lock"
 fi
 
-if [ -f /tmp/.X11-unix/X40 ]; then
+if [ -e /tmp/.X11-unix/X40 ]; then
   rm /tmp/.X11-unix/X40
   greenMessage "Deleted /tmp/.X11-unix/X40"
 fi
