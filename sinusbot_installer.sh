@@ -59,7 +59,7 @@ trap 'err_report $LINENO' ERR
 
 cyanMessage "Checking for the latest latest installer version"
 if [ -f /etc/centos-release ]; then
-  yum -y -q install virt-what
+  yum -y -q install wget
 else
   apt-get -qq install wget -y  
 fi
@@ -256,10 +256,12 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     OSBRANCH=$(lsb_release -c 2> /dev/null | grep 'Codename' | awk '{print $2}')
     
     if [ $OS == "debian" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
+        apt-get -qq install dmidecode -y >/dev/null
         wget -q http://ftp.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
         dpkg -i ./virt-what_1.14-1_amd64.deb
         rm virt-what_1.14-1_amd64.deb
     elif [ $OS == "ubuntu" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
+        apt-get -qq install dmidecode -y >/dev/null
         wget -q http://de.archive.ubuntu.com/ubuntu/pool/universe/v/virt-what/virt-what_1.13-1_amd64.deb
         dpkg -i ./virt-what_1.13-1_amd64.deb
         rm virt-what_1.13-1_amd64.deb
