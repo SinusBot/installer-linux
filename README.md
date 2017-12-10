@@ -9,6 +9,8 @@ Officially supported linux distributions:
 Features:
 
 - Install the SinusBot to a selected folder
+  - Automatic = /opt/sinusbot
+  - or own dir
 - Update the SinusBot and youtube-dl
 - Reset the password
 - Uninstall the bot
