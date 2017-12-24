@@ -557,13 +557,15 @@ if [ -f /etc/centos-release ]; then
   service ntpd stop
   ntpd -s 0.pool.ntp.org
   service ntpd start
-  greenMessage "Automatic time set"!
+  TIME=$(date)
+  greenMessage "Automatically set time to" $TIME!
 else
   if [ $OS != "ubuntu" ]; then
   service ntp restart
   timedatectl set-ntp yes
   timedatectl >/dev/null
-  greenMessage "Automatic time set"!
+  TIME=$(date)
+  greenMessage "Automatically set time to" $TIME!
   elif [ $OS == "ubuntu" ]; then
   redMessage "Can't set your date automatically. Please follow the following steps:"
   read -rp "Day    (01-32): " DAY
