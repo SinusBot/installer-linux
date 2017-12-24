@@ -49,7 +49,9 @@ function makeDir {
 }
 
 err_report() {
-    redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script. Or have a look directly to your error: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L""$1"
+    failed_command=$(curl -s https://raw.githubusercontent.com/Sinusbot/installer-linux/master/sinusbot_installer.sh | sed -e "$1q;d")
+    redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script."
+    redMessage "Command which failed was: \"${failed_command}\". Direct URL: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L""$1"
     exit 1
 }
 
