@@ -49,7 +49,7 @@ function makeDir {
 }
 
 err_report() {
-    FAILED_COMMAND=$(curl -s https://raw.githubusercontent.com/Sinusbot/installer-linux/master/sinusbot_installer.sh | sed -e "$1q;d")
+    FAILED_COMMAND=$(wget -q -O - https://raw.githubusercontent.com/Sinusbot/installer-linux/master/sinusbot_installer.sh | sed -e "$1q;d")
     redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script."
     if [["$FAILED_COMMAND" == "" ]]; then
       redMessage "Failed command: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L""$1"
@@ -251,8 +251,9 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     
     if [ -f /etc/debian_version ]; then
       greenMessage "Check if lsb-release and debconf-utils is installed..."
-      apt-get -qq install debconf-utils -y >/dev/null
-      apt-get -qq install lsb-release -y >/dev/null
+      apt-get -qq update
+      apt-get -qq install debconf-utils -y
+      apt-get -qq install lsb-release -y
       greenMessage "Done"!
     fi
     
@@ -662,9 +663,9 @@ fi
 
 greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-for VERSION in ` curl -s http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1`; do
+for VERSION in `wget -q -O - http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1`; do
   DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
-  STATUS=`curl -I $DOWNLOAD_URL_VERSION 2>&1 | grep "HTTP/" | awk '{print $2}'`
+  STATUS=`wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}'`
   if [ "$STATUS" == "200" ]; then
     DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
     break
