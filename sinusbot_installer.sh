@@ -626,7 +626,7 @@ fi
   
   redMessage 'Update the system packages to the latest version? Recommended, as otherwise dependencies might break! Option "No" will exit the installer'
   
-  OPTIONS=("Yes" "Try without" "No")
+  OPTIONS=("Yes" "No")
   select OPTION in "${OPTIONS[@]}"; do
     case "$REPLY" in
       1|2 ) break;;
@@ -645,17 +645,15 @@ fi
     sleep 3
     
     if [ -f /etc/centos-release ]; then
-      yum -y -q update && yum -y -q install curl >/dev/null
+      yum -y -q update
+      yum -y -q upgrade
     else
-      apt-get -qq update && apt-get -qq upgrade -y && apt-get -qq install curl -y >/dev/null
+      apt-get -qq update
+      apt-get -qq upgrade
     fi
     
-    elif [ "$OPTION" == "Try without" ]; then
-    if [ -f /etc/centos-release ]; then
-      yum -y -q install curl >/dev/null
-    else
-      apt-get -qq install curl -y >/dev/null
-    fi
+    elif [ "$OPTION" == "No" ]; then
+      errorExit "Exiting due no system updates"
   fi
 fi
 
@@ -754,17 +752,11 @@ if [ -f CHANGELOG ] && [ $(cat CHANGELOG | awk '/Client Release/{ print $4; exit
 else
   
   greenMessage "Downloading TS3 client files."
-  su -c "curl -O -s $DOWNLOAD_URL" $SINUSBOTUSER
-fi
-
-if [[ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run && ! -f ts3client_linux_$ARCH ]]; then
-  redMessage "Error while downloading TS3-Client with cURL, tying it with wget"
   su -c "wget -q $DOWNLOAD_URL" $SINUSBOTUSER
-  
+
   if [[ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run && ! -f ts3client_linux_$ARCH ]]; then
     errorExit "Download failed! Exiting now"!
   fi
-  
 fi
 
 # Installing TS3-Client.
@@ -795,18 +787,7 @@ cd $LOCATION
 
 greenMessage "Downloading latest SinusBot."
 
-STATUS=$(curl -I https://www.sinusbot.com/dl/sinusbot.current.tar.bz2 2>&1 | grep "HTTP/" | awk '{print $2}')
-if [ "$STATUS" == "200" ]; then
-  su -c "curl -O -s https://www.sinusbot.com/dl/sinusbot.current.tar.bz2" $SINUSBOTUSER
-else
-  redMessage "Error while downloading with cURL (Status = $STATUS). Trying it with wget."
-  if  [ -f /etc/centos-release ]; then
-    yum -y -q install wget
-  fi
-  apt-get -qq install wget -y >/dev/null
-  su -c "wget -q https://www.sinusbot.com/dl/sinusbot.current.tar.bz2" $SINUSBOTUSER
-fi
-
+su -c "wget -q https://www.sinusbot.com/dl/sinusbot.current.tar.bz2" $SINUSBOTUSER
 if [[ ! -f sinusbot.current.tar.bz2 && ! -f sinusbot ]]; then
   errorExit "Download failed! Exiting now"!
 fi
