@@ -264,14 +264,14 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     
     if [ $OS == "debian" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
         apt-get -qq install dmidecode -y >/dev/null
-        wget -q http://ftp.debian.org/debian/pool/main/v/virt-what/virt-what_1.14-1_amd64.deb
-        dpkg -i ./virt-what_1.14-1_amd64.deb
-        rm virt-what_1.14-1_amd64.deb
+        wget -q http://ftp.debian.org/debian/pool/main/v/virt-what/virt-what_1.18-1_amd64.deb
+        dpkg -i ./virt-what_1.18-1_amd64.deb
+        rm virt-what_1.18-1_amd64.deb
     elif [ $OS == "ubuntu" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
         apt-get -qq install dmidecode -y >/dev/null
-        wget -q http://de.archive.ubuntu.com/ubuntu/pool/universe/v/virt-what/virt-what_1.13-1_amd64.deb
-        dpkg -i ./virt-what_1.13-1_amd64.deb
-        rm virt-what_1.13-1_amd64.deb
+        wget -q http://de.archive.ubuntu.com/ubuntu/pool/universe/v/virt-what/virt-what_1.18-1_amd64.deb
+        dpkg -i ./virt-what_1.18-1_amd64.deb
+        rm virt-what_1.18-1_amd64.deb
     fi
     
     if [ $(virt-what | grep "openvz") ]; then
@@ -287,7 +287,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
   if [ "$INSTALL" != "Rem" ]; then
     if [ -z "$OS" ]; then
       errorExit "Error: Could not detect OS. Currently only Debian, Ubuntu and CentOS are supported. Aborting"!
-      elif [ -z "$OS" ] && ( [ "$(cat /etc/debian_version | awk '{print $1}')" == "7" ] || [ $(cat /etc/debian_version | grep "7.") ] ); then
+    elif [ -z "$OS" ] && ( [ "$(cat /etc/debian_version | awk '{print $1}')" == "7" ] || [ $(cat /etc/debian_version | grep "7.") ] ); then
       errorExit "Debian 7 isn't supported anymore"!
     fi
     
@@ -303,13 +303,12 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
   fi
   
   if [ "$OS" != "ubuntu" ] && [ "$INSTALL" != "Rem" ]; then
-
-  if [ -d /usr/lib/systemd ]; then
-    yellowMessage "Automatically chosen system.d for your startscript"!
-  else
-    OS="ubuntu"
-    yellowMessage "Automatically chosen init.d for your startscript"!
-  fi
+    if [ -d /usr/lib/systemd ]; then
+      yellowMessage "Automatically chosen system.d for your startscript"!
+    else
+      OS="ubuntu"
+      yellowMessage "Automatically chosen init.d for your startscript"!
+    fi
   fi
   
   # Set path or continue with normal
@@ -327,10 +326,8 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
   
   if [ "$OPTION" == "Automatic" ]; then
     LOCATION=/opt/sinusbot
-    
-    elif [ "$OPTION" == "Own path" ]; then
+  elif [ "$OPTION" == "Own path" ]; then
     yellowMessage "Enter location where the bot should be installed/updated/removed. Like /opt/sinusbot. Include the / at first position and none at the end"!
-    
     LOCATION=""
     while [[ ! -d $LOCATION ]]; do
       read -rp "Location [/opt/sinusbot]: " LOCATION
