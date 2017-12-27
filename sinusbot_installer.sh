@@ -112,11 +112,11 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
   
   if [ "$OPTION" == "Install" ]; then
     INSTALL="Inst"
-    elif [ "$OPTION" == "Update" ]; then
+  elif [ "$OPTION" == "Update" ]; then
     INSTALL="Updt"
-    elif [ "$OPTION" == "Remove" ]; then
+  elif [ "$OPTION" == "Remove" ]; then
     INSTALL="Rem"
-    elif [ "$OPTION" == "PW Reset" ]; then
+  elif [ "$OPTION" == "PW Reset" ]; then
     INSTALL="Res"
   fi
   
@@ -136,7 +136,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     
     if [ "$OPTION" == "Automatic" ]; then
       LOCATION=/opt/sinusbot
-      elif [ "$OPTION" == "Own path" ]; then
+    elif [ "$OPTION" == "Own path" ]; then
       yellowMessage "Enter location where the bot should be installed/updated/removed. Like /opt/sinusbot. Include the / at first position and none at the end"!
       
       LOCATION=""
@@ -639,7 +639,7 @@ fi
   sleep 2
   
   if [ "$OPTION" == "Yes" ]; then
-    greenMessage "Updating the system in a few seconds silently (no optical output)"!
+    greenMessage "Updating the system in a few seconds"!
     sleep 1
     redMessage "This could take a while. Please wait up to 10 minutes"!
     sleep 3
