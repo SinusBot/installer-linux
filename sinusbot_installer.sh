@@ -846,7 +846,7 @@ elif [ $OS == "ubuntu" ]; then
 
   cd /etc/init.d/
 
-  wget -q https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot
+  wget -q https://raw.githubusercontent.com/Sinusbot/linux-startscript/obsolete-init.d/sinusbot
 
   if [ ! -f sinusbot ]; then
     errorExit "Download failed! Exiting now"!
