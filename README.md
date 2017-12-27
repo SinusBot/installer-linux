@@ -1,4 +1,4 @@
-# SinusBot Installer [LINUX]
+# SinusBot Installer for Linux
 
 ## Officially supported linux distributions
 
