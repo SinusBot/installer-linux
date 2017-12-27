@@ -1,12 +1,12 @@
-# SinusBot Installer [LINUX]
+# SinusBot Installer for Linux
 
-Officially supported linux distributions:
+## Officially supported linux distributions
 
 - Debian 8+
 - Ubuntu 14.0.4+
 - CentOS 6+
 
-Features:
+## Features
 
 - Install the SinusBot to a selected folder
   - Automatic = /opt/sinusbot
@@ -37,6 +37,6 @@ The duration of the installation process depends on your system (how many packag
 
 [![Watch video](https://img.youtube.com/vi/_GEd_ert7PA/0.jpg)](https://www.youtube.com/watch?v=_GEd_ert7PA)
 
-Contribution:
+## Contribution
 
 If you want to contribute, the sourcecode is formatted with the [shell-format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format) extension from VS Code.
