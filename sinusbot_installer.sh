@@ -684,10 +684,10 @@ fi
 magentaMessage "Installing necessary packages. Please wait..."
 
 if [ -f /etc/centos-release ]; then
-  yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 >/dev/null
+  yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 >/dev/null
   update-ca-trust extract >/dev/null
 else
-  apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 curl less cron-apt ntp python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 -y >/dev/null
+  apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 -y >/dev/null
   update-ca-certificates >/dev/null
 fi
 
@@ -828,17 +828,7 @@ if [ $OS != "ubuntu" ]; then
   
   cd /lib/systemd/system/
   
-  STATUS=$(curl -I https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service 2>&1 | grep "HTTP/" | awk '{print $2}')
-  if [ "$STATUS" == "200" ]; then
-    curl -O -s https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service
-  else
-    redMessage "Error while downloading systemd script with cURL. Trying it with wget."
-    if  [ -f /etc/centos-release ]; then
-      yum -y -q install wget
-    fi
-    apt-get -qq install wget -y >/dev/null
-    wget -q https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service
-  fi
+  wget -q https://raw.githubusercontent.com/Sinusbot/linux-startscript/master/sinusbot.service
   
   if [ ! -f sinusbot.service ]; then
     errorExit "Download failed! Exiting now"!
@@ -859,21 +849,10 @@ if [ $OS != "ubuntu" ]; then
   
   cd /etc/init.d/
   
-  STATUS=$(curl -I https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot 2>&1 | grep "HTTP/" | awk '{print $2}')
-  if [ "$STATUS" == "200" ]; then
-    curl -O -s https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot
-  else
-    redMessage "Error while downloading init.d script with cURL. Trying it with wget."
-    if  [ -f /etc/centos-release ]; then
-      yum -y -q install wget
-    fi
-    apt-get -qq install wget -y >/dev/null
-    wget -q https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot
-  fi
+  wget -q https://raw.githubusercontent.com/Qhiliqq/Sinusbot-Startscript/master/sinusbot
   
   if [ ! -f sinusbot ]; then
     errorExit "Download failed! Exiting now"!
-    
   fi
   
   sed -i 's/USER="mybotuser"/USER="'$SINUSBOTUSER'"/g' /etc/init.d/sinusbot
@@ -934,17 +913,7 @@ if [ "$YT" == "Yes" ]; then
   fi
   
   greenMessage "Downloading YT-DL now..."
-  STATUS=$(curl -I http://yt-dl.org/downloads/latest/youtube-dl 2>&1 | grep "HTTP/" | awk '{print $2}')
-  if [ "$STATUS" == "302" ]; then
-    curl -L -s http://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
-  else
-    redMessage "Error while downloading youtube-dl with cURL. Trying it with wget."
-    if [ -f /etc/centos-release ]; then
-      yum -y -q install wget
-    fi
-    apt-get -qq install wget -y >/dev/null
-    wget -q -O /usr/local/bin/youtube-dl http://yt-dl.org/downloads/latest/youtube-dl
-  fi
+  wget -q -O /usr/local/bin/youtube-dl http://yt-dl.org/downloads/latest/youtube-dl
   
   if [ ! -f /usr/local/bin/youtube-dl ]; then
     errorExit "Download failed! Exiting now"!
