@@ -459,23 +459,19 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       done
     fi
 
-    if [ -f /lib/systemd/system/sinusbot.service ] && [ "$OS" != "ubuntu" ]; then
+    if [ -f /lib/systemd/system/sinusbot.service ]; then
       if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
         service sinusbot stop 2>/dev/null
         systemctl disable sinusbot 2>/dev/null
-        rm /lib/systemd/system/sinusbot.service
-      else
-        rm /lib/systemd/system/sinusbot.service
       fi
+      rm /lib/systemd/system/sinusbot.service
     elif [ -f /etc/init.d/sinusbot ]; then
       if [ "$(/etc/init.d/sinusbot status | awk '{print $NF; exit}')" == "UP" ]; then
         su -c "/etc/init.d/sinusbot stop" $SINUSBOTUSER
         su -c "screen -wipe" $SINUSBOTUSER
         update-rc.d -f sinusbot remove >/dev/null
-        rm /etc/init.d/sinusbot
-      else
-        rm /etc/init.d/sinusbot
       fi
+      rm /etc/init.d/sinusbot
     fi
 
     if [ -f /etc/cron.d/sinusbot ]; then
@@ -845,7 +841,7 @@ if [[ "$USE_SYSTEMD" == true ]]; then
 
   greenMessage 'Installed systemd file to start the SinusBot with "service sinusbot {start|stop|status|restart}"'
 
-elif [ $OS == "ubuntu" ]; then
+elif [[ "$USE_SYSTEMD" == false ]]; then
 
   greenMessage "Starting init.d installation"
 
@@ -1017,7 +1013,7 @@ fi
 
 # If startup failed, the script will start normal sinusbot without screen for looking about errors. If startup successed => installation done.
 
-if [[ ($(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" && $OS != "ubuntu") || ($(/etc/init.d/sinusbot status | awk '{print $NF; exit}') == "UP" && $OS == "ubuntu") ]]; then
+if [[ ($(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" && "$USE_SYSTEMD" == true) || ($(/etc/init.d/sinusbot status | awk '{print $NF; exit}') == "UP" && "$USE_SYSTEMD" == false) ]]; then
 
   if [[ $INSTALL == "Inst" ]]; then
     greenMessage "Install done"!
@@ -1042,9 +1038,9 @@ if [[ ($(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP
   else
     greenMessage "All right. Everything is installed successfully. SinusBot is UP on '$ipaddress:8087' :) Your user = 'admin' and password = '$password'"
   fi
-  if [[ $OS != "ubuntu" ]]; then
+  if [[ "$USE_SYSTEMD" == true ]]; then
     redMessage 'Stop it with "service sinusbot stop".'
-  elif [[ $OS == "ubuntu" ]]; then
+  elif [[ "$USE_SYSTEMD" == false ]]; then
     redMessage 'Stop it with "/etc/init.d/sinusbot stop".'
   fi
   magentaMessage "Don't forget to rate this script on: https://forum.sinusbot.com/resources/sinusbot-installer-script.58/"
