@@ -6,6 +6,8 @@
 MACHINE=$(uname -m)
 Instversion="1.4"
 
+USE_SYSTEMD=true
+
 # Functions
 
 function greenMessage() {
@@ -85,6 +87,10 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Start installer
+
+if [[ $(which systemctl) == "" ]]; then
+  USE_SYSTEMD=false
+fi
 
 if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
   greenMessage "This is the automatic installer for latest SinusBot. USE AT YOUR OWN RISK"!
@@ -302,11 +308,10 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     fi
   fi
 
-  if [ "$OS" != "ubuntu" ] && [ "$INSTALL" != "Rem" ]; then
-    if [ -d /usr/lib/systemd ]; then
+  if [[ "$INSTALL" != "Rem" ]]; then
+    if [[ "$USE_SYSTEMD" == true ]]; then
       yellowMessage "Automatically chosen system.d for your startscript"!
     else
-      OS="ubuntu"
       yellowMessage "Automatically chosen init.d for your startscript"!
     fi
   fi
@@ -813,7 +818,7 @@ elif [ "$INSTALL" == "Updt" ]; then
   greenMessage "SinusBot update done."
 fi
 
-if [ $OS != "ubuntu" ]; then
+if [[ "$USE_SYSTEMD" == true ]]; then
 
   greenMessage "Starting systemd installation"
 
@@ -859,14 +864,11 @@ elif [ $OS == "ubuntu" ]; then
 
   if [ -f /etc/centos-release ]; then
     chkconfig sinusbot on >/dev/null
-
   else
     update-rc.d sinusbot defaults >/dev/null
   fi
 
   greenMessage 'Installed init.d file to start the SinusBot with "/etc/init.d/sinusbot {start|stop|status|restart|console|update|backup}"'
-else
-  errorExit "Error while checking systemd or init.d script. Ask the author for help."
 fi
 
 cd $LOCATION
@@ -926,7 +928,7 @@ fi
 
 # Creating Readme
 
-if [ ! -a "$LOCATION/README_installer.txt" ] && [ $OS != "ubuntu" ]; then
+if [ ! -a "$LOCATION/README_installer.txt" ] && [ "$USE_SYSTEMD" == true ]; then
   echo '##################################################################################
 # #
 # Usage: service sinusbot {start|stop|status|restart} #
@@ -936,7 +938,7 @@ if [ ! -a "$LOCATION/README_installer.txt" ] && [ $OS != "ubuntu" ]; then
 # - restart: restart the bot #
 # #
 ##################################################################################' >>$LOCATION/README_installer.txt
-elif [ ! -a "$LOCATION/README_installer.txt" ] && [ $OS == "ubuntu" ]; then
+elif [ ! -a "$LOCATION/README_installer.txt" ] && [ "$USE_SYSTEMD" == false ]; then
   echo '##################################################################################
   # #
   # Usage: /etc/init.d/sinusbot {start|stop|status|restart|console|update|backup} #
@@ -987,21 +989,21 @@ if [ "$INSTALL" != "Updt" ]; then
   greenMessage "Starting SinusBot again."
 fi
 
-if [ $OS != "ubuntu" ]; then
+if [[ "$USE_SYSTEMD" == true ]]; then
   service sinusbot start
-elif [ $OS == "ubuntu" ]; then
+elif [[ "$USE_SYSTEMD" == false ]]; then
   /etc/init.d/sinusbot start
 fi
 yellowMessage "Please wait... This will take some seconds"!
 chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
-if [ $OS != "ubuntu" ]; then
+
+if [[ "$USE_SYSTEMD" == true ]]; then
   sleep 5
-elif [ $OS == "ubuntu" ]; then
+elif [[ "$USE_SYSTEMD" == false ]]; then
   sleep 10
 fi
 
 if [ -f /etc/centos-release ]; then
-
   if [ "$FIREWALL" == "ip" ]; then
     iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 8087 -j ACCEPT
   elif [ "$FIREWALL" == "fs" ]; then
