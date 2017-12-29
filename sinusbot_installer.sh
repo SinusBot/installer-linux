@@ -627,8 +627,8 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
   OPTIONS=("Yes" "No")
   select OPTION in "${OPTIONS[@]}"; do
     case "$REPLY" in
-    1 | 2) break ;;
-    3) errorQuit ;;
+    1) break ;;
+    2) errorQuit ;;
     *) errorContinue ;;
     esac
   done
@@ -649,9 +649,6 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       apt-get -qq update
       apt-get -qq upgrade
     fi
-
-  elif [ "$OPTION" == "No" ]; then
-    errorExit "Exiting due no system updates"
   fi
 fi
 
@@ -699,7 +696,6 @@ ipaddress=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
 
 if [ "$INSTALL" == "Updt" ]; then
   SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
-
 else
 
   cyanMessage 'Please enter the name of the sinusbot user. Typically "sinusbot". If it does not exists, the installer will create it.'
