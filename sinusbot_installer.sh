@@ -187,7 +187,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
 
     greenMessage "Please login to your SinusBot webinterface as admin and '$PW'"
-    yellowMessage "After that change your password under user accounts->admin. The script restart the bot with init.d or systemd."
+    yellowMessage "After that change your password under Settings->User Accounts->admin->Edit. The script restart the bot with init.d or systemd."
 
     if [ -f /lib/systemd/system/sinusbot.service ]; then
       if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
@@ -209,7 +209,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       echo -ne '(Waiting for password change!)\r'
 
       if grep -Fq "$match" "$log"; then
-        pkill -f $PW
+        pkill -INT $PW
         rm $log
 
         greenMessage "Successfully changed your admin password."
