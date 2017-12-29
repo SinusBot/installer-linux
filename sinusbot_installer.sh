@@ -209,7 +209,7 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       echo -ne '(Waiting for password change!)\r'
 
       if grep -Fq "$match" "$log"; then
-        pkill -INT $PW
+        pkill -INT -f $PW
         rm $log
 
         greenMessage "Successfully changed your admin password."
