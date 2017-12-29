@@ -4,7 +4,7 @@
 
 - Debian 8+
 - Ubuntu 14.0.4+
-- CentOS 6+
+- CentOS 7+
 
 ## Features
 
