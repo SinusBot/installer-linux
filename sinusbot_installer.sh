@@ -80,244 +80,55 @@ else
   sleep 1
 fi
 
-# Must be root. Checking...
-
+# Check if the script was run as root user. Otherwise exit the script
 if [ "$(id -u)" != "0" ]; then
   errorExit "Change to root account required!"
 fi
 
-# Start installer
-
+# Detect if systemctl is available then use systemd as start script. Otherwise use init.d
 if [[ $(which systemctl) == "" ]]; then
   USE_SYSTEMD=false
 fi
 
-if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
-  greenMessage "This is the automatic installer for latest SinusBot. USE AT YOUR OWN RISK"!
-  sleep 1
-  cyanMessage "You can choose between installing, upgrading and removing the SinusBot."
-  sleep 1
-  redMessage "Installer by Philipp Esswein | DAThosting.eu - Your game-/voiceserver hoster (only german)."
-  sleep 1
-  magentaMessage "Please rate this script at: https://forum.sinusbot.com/resources/sinusbot-installer-script.58/"
-  sleep 1
-  yellowMessage "You're using Installer $Instversion"
+# If the linux distribution is not debian and centos, then exit
+if [ ! -f /etc/debian_version ] && [ ! -f /etc/centos-release ]; then
+  errorExit 'Not supported linux distribution. Only Debian and CentOS are currently supported'!
+fi
 
-  # What should be done?
+greenMessage "This is the automatic installer for latest SinusBot. USE AT YOUR OWN RISK"!
+sleep 1
+cyanMessage "You can choose between installing, upgrading and removing the SinusBot."
+sleep 1
+redMessage "Installer by Philipp Esswein | DAThosting.eu - Your game-/voiceserver hoster (only german)."
+sleep 1
+magentaMessage "Please rate this script at: https://forum.sinusbot.com/resources/sinusbot-installer-script.58/"
+sleep 1
+yellowMessage "You're using Installer $Instversion"
 
-  redMessage "What should the Installer do?"
+# selection menu if the installer should install, update, remove or pw reset the SinusBot
+redMessage "What should the Installer do?"
+OPTIONS=("Install" "Update" "Remove" "PW Reset" "Quit")
+select OPTION in "${OPTIONS[@]}"; do
+  case "$REPLY" in
+  1 | 2 | 3 | 4) break ;;
+  5) errorQuit ;;
+  *) errorContinue ;;
+  esac
+done
 
-  OPTIONS=("Install" "Update" "Remove" "PW Reset" "Quit")
-  select OPTION in "${OPTIONS[@]}"; do
-    case "$REPLY" in
-    1 | 2 | 3 | 4) break ;;
-    5) errorQuit ;;
-    *) errorContinue ;;
-    esac
-  done
+if [ "$OPTION" == "Install" ]; then
+  INSTALL="Inst"
+elif [ "$OPTION" == "Update" ]; then
+  INSTALL="Updt"
+elif [ "$OPTION" == "Remove" ]; then
+  INSTALL="Rem"
+elif [ "$OPTION" == "PW Reset" ]; then
+  INSTALL="Res"
+fi
 
-  if [ "$OPTION" == "Install" ]; then
-    INSTALL="Inst"
-  elif [ "$OPTION" == "Update" ]; then
-    INSTALL="Updt"
-  elif [ "$OPTION" == "Remove" ]; then
-    INSTALL="Rem"
-  elif [ "$OPTION" == "PW Reset" ]; then
-    INSTALL="Res"
-  fi
+# PW Reset
 
-  # PW Reset
-
-  if [[ $INSTALL == "Res" ]]; then
-    yellowMessage "Automatic usage or own directories?"
-
-    OPTIONS=("Automatic" "Own path" "Quit")
-    select OPTION in "${OPTIONS[@]}"; do
-      case "$REPLY" in
-      1 | 2) break ;;
-      3) errorQuit ;;
-      *) errorContinue ;;
-      esac
-    done
-
-    if [ "$OPTION" == "Automatic" ]; then
-      LOCATION=/opt/sinusbot
-    elif [ "$OPTION" == "Own path" ]; then
-      yellowMessage "Enter location where the bot should be installed/updated/removed. Like /opt/sinusbot. Include the / at first position and none at the end"!
-
-      LOCATION=""
-      while [[ ! -d $LOCATION ]]; do
-        read -rp "Location [/opt/sinusbot]: " LOCATION
-        if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
-          redMessage "Directory not found, try again"!
-        fi
-      done
-
-      greenMessage "Your directory is $LOCATION."
-
-      OPTIONS=("Yes" "No, change it" "Quit")
-      select OPTION in "${OPTIONS[@]}"; do
-        case "$REPLY" in
-        1 | 2) break ;;
-        3) errorQuit ;;
-        *) errorContinue ;;
-        esac
-      done
-
-      if [ "$OPTION" == "No, change it" ]; then
-        LOCATION=""
-        while [[ ! -d $LOCATION ]]; do
-          read -rp "Location [/opt/sinusbot]: " LOCATION
-          if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
-            redMessage "Directory not found, try again"!
-          fi
-        done
-
-        greenMessage "Your directory is $LOCATION."
-      fi
-    fi
-
-    LOCATIONex=$LOCATION/sinusbot
-
-    if [[ ! -f $LOCATION/sinusbot ]]; then
-      errorExit "SinusBot wasn't found at $LOCATION. Exiting script."
-    fi
-
-    PW=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
-    SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
-
-    greenMessage "Please login to your SinusBot webinterface as admin and '$PW'"
-    yellowMessage "After that change your password under Settings->User Accounts->admin->Edit. The script restart the bot with init.d or systemd."
-
-    if [ -f /lib/systemd/system/sinusbot.service ]; then
-      if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
-        service sinusbot stop
-      fi
-    elif [ -f /etc/init.d/sinusbot ]; then
-      if [ "$(/etc/init.d/sinusbot status | awk '{print $NF; exit}')" == "UP" ]; then
-        /etc/init.d/sinusbot stop
-      fi
-    fi
-
-    log="/tmp/sinusbot.log"
-    match="USER-PATCH [admin] (admin) OK"
-
-    su -c "$LOCATIONex --override-password $PW" $SINUSBOTUSER >"$log" 2>&1 &
-    sleep 3
-
-    while true; do
-      echo -ne '(Waiting for password change!)\r'
-
-      if grep -Fq "$match" "$log"; then
-        pkill -INT -f $PW
-        rm $log
-
-        greenMessage "Successfully changed your admin password."
-
-        if [ -f /lib/systemd/system/sinusbot.service ]; then
-          service sinusbot start
-          greenMessage "Started your bot with systemd."
-        elif [ -f /etc/init.d/sinusbot ]; then
-          /etc/init.d/sinusbot start
-          greenMessage "Started your bot with initd."
-        else
-          redMessage "Please start your bot normally"!
-        fi
-        exit 0
-      fi
-    done
-
-  fi
-
-  # Check which OS
-
-  if [ "$INSTALL" != "Rem" ]; then
-
-    if [ -f /etc/centos-release ]; then
-      greenMessage "Installing redhat-lsb! Please wait."
-      yum -y -q install redhat-lsb
-      greenMessage "Done"!
-
-      yellowMessage "You're running CentOS. Which firewallsystem you're using?"
-
-      OPTIONS=("IPtables" "Firewalld")
-      select OPTION in "${OPTIONS[@]}"; do
-        case "$REPLY" in
-        1 | 2) break ;;
-        *) errorContinue ;;
-        esac
-      done
-
-      if [ "$OPTION" == "IPtables" ]; then
-        FIREWALL="ip"
-      elif [ "$OPTION" == "Firewalld" ]; then
-        FIREWALL="fd"
-      fi
-    fi
-
-    if [ -f /etc/debian_version ]; then
-      greenMessage "Check if lsb-release and debconf-utils is installed..."
-      apt-get -qq update
-      apt-get -qq install debconf-utils -y
-      apt-get -qq install lsb-release -y
-      greenMessage "Done"!
-    fi
-
-    # Functions from lsb_release
-
-    OS=$(lsb_release -i 2>/dev/null | grep 'Distributor' | awk '{print tolower($3)}')
-    OSBRANCH=$(lsb_release -c 2>/dev/null | grep 'Codename' | awk '{print $2}')
-
-    if [ $OS == "debian" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
-      apt-get -qq install dmidecode -y >/dev/null
-      wget -q http://ftp.debian.org/debian/pool/main/v/virt-what/virt-what_1.18-1_amd64.deb
-      dpkg -i ./virt-what_1.18-1_amd64.deb
-      rm virt-what_1.18-1_amd64.deb
-    elif [ $OS == "ubuntu" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
-      apt-get -qq install dmidecode -y >/dev/null
-      wget -q http://de.archive.ubuntu.com/ubuntu/pool/universe/v/virt-what/virt-what_1.18-1_amd64.deb
-      dpkg -i ./virt-what_1.18-1_amd64.deb
-      rm virt-what_1.18-1_amd64.deb
-    fi
-
-    if [ $(virt-what | grep "openvz") ]; then
-      redMessage "Warning, your server running under OpenVZ! This is an very old container system and isn't well supported by newer packages."
-    elif [ $(virt-what | grep "docker") ]; then
-      redMessage "Warning, your server running under Docker! Maybe there are failures while installing."
-    fi
-
-  fi
-
-  # Go on
-
-  if [ "$INSTALL" != "Rem" ]; then
-    if [ -z "$OS" ]; then
-      errorExit "Error: Could not detect OS. Currently only Debian, Ubuntu and CentOS are supported. Aborting"!
-    elif [ -z "$OS" ] && ([ "$(cat /etc/debian_version | awk '{print $1}')" == "7" ] || [ $(cat /etc/debian_version | grep "7.") ]); then
-      errorExit "Debian 7 isn't supported anymore"!
-    fi
-
-    if [ -z "$OSBRANCH" ] && [ -f /etc/centos-release ]; then
-      errorExit "Error: Could not detect branch of OS. Aborting"
-    fi
-
-    if [ "$MACHINE" == "x86_64" ]; then
-      ARCH="amd64"
-    else
-      errorExit "$MACHINE is not supported"!
-    fi
-  fi
-
-  if [[ "$INSTALL" != "Rem" ]]; then
-    if [[ "$USE_SYSTEMD" == true ]]; then
-      yellowMessage "Automatically chosen system.d for your startscript"!
-    else
-      yellowMessage "Automatically chosen init.d for your startscript"!
-    fi
-  fi
-
-  # Set path or continue with normal
-
+if [[ $INSTALL == "Res" ]]; then
   yellowMessage "Automatic usage or own directories?"
 
   OPTIONS=("Automatic" "Own path" "Quit")
@@ -333,17 +144,12 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     LOCATION=/opt/sinusbot
   elif [ "$OPTION" == "Own path" ]; then
     yellowMessage "Enter location where the bot should be installed/updated/removed. Like /opt/sinusbot. Include the / at first position and none at the end"!
+
     LOCATION=""
     while [[ ! -d $LOCATION ]]; do
       read -rp "Location [/opt/sinusbot]: " LOCATION
       if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
         redMessage "Directory not found, try again"!
-      fi
-      if [ "$INSTALL" == "Inst" ]; then
-        if [ "$LOCATION" == "" ]; then
-          LOCATION=/opt/sinusbot
-        fi
-        makeDir $LOCATION
       fi
     done
 
@@ -365,9 +171,6 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
         if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
           redMessage "Directory not found, try again"!
         fi
-        if [ "$INSTALL" == "Inst" ]; then
-          makeDir $LOCATION
-        fi
       done
 
       greenMessage "Your directory is $LOCATION."
@@ -376,179 +179,68 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
 
   LOCATIONex=$LOCATION/sinusbot
 
-  # Check if SinusBot already installed and if update is possible
+  if [[ ! -f $LOCATION/sinusbot ]]; then
+    errorExit "SinusBot wasn't found at $LOCATION. Exiting script."
+  fi
 
-  if [[ $INSTALL == "Inst" ]]; then
-    if [[ -f $LOCATION/sinusbot ]]; then
-      redMessage "SinusBot already installed with automatic install option"!
-      read -rp "Would you like to update the bot instead? [Y / N]: " OPTION
+  PW=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
+  SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
 
-      if [ "$OPTION" == "Y" ] || [ "$OPTION" == "y" ] || [ "$OPTION" == "" ]; then
-        INSTALL="Updt"
-      elif [ "$OPTION" == "N" ] || [ "$OPTION" == "n" ]; then
-        errorExit "Installer stops now"!
-      fi
-    else
-      greenMessage "SinusBot isn't installed yet. Installer goes on."
+  greenMessage "Please login to your SinusBot webinterface as admin and '$PW'"
+  yellowMessage "After that change your password under Settings->User Accounts->admin->Edit. The script restart the bot with init.d or systemd."
+
+  if [ -f /lib/systemd/system/sinusbot.service ]; then
+    if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
+      service sinusbot stop
     fi
-
-  elif [ "$INSTALL" == "Rem" ] || [ "$INSTALL" == "Updt" ]; then
-    if [ ! -d $LOCATION ]; then
-      errorExit "SinusBot isn't installed"!
-    else
-      greenMessage "SinusBot is installed. Installer goes on."
+  elif [ -f /etc/init.d/sinusbot ]; then
+    if [ "$(/etc/init.d/sinusbot status | awk '{print $NF; exit}')" == "UP" ]; then
+      /etc/init.d/sinusbot stop
     fi
   fi
 
-  # Remove SinusBot
+  log="/tmp/sinusbot.log"
+  match="USER-PATCH [admin] (admin) OK"
 
-  if [ "$INSTALL" == "Rem" ]; then
+  su -c "$LOCATIONex --override-password $PW" $SINUSBOTUSER >"$log" 2>&1 &
+  sleep 3
 
-    SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
+  while true; do
+    echo -ne '(Waiting for password change!)\r'
 
-    if [ -f /usr/local/bin/youtube-dl ]; then
-      redMessage "Remove YoutubeDL?"
+    if grep -Fq "$match" "$log"; then
+      pkill -INT -f $PW
+      rm $log
 
-      OPTIONS=("Yes" "No")
-      select OPTION in "${OPTIONS[@]}"; do
-        case "$REPLY" in
-        1 | 2) break ;;
-        *) errorContinue ;;
-        esac
-      done
+      greenMessage "Successfully changed your admin password."
 
-      if [ "$OPTION" == "Yes" ]; then
-        if [ -f /usr/local/bin/youtube-dl ]; then
-          rm /usr/local/bin/youtube-dl
-        fi
-
-        if [ -f /etc/cron.d/ytdl ]; then
-          rm /etc/cron.d/ytdl
-        fi
-
-        greenMessage "Removed YT-DL successfully"!
+      if [ -f /lib/systemd/system/sinusbot.service ]; then
+        service sinusbot start
+        greenMessage "Started your bot with systemd."
+      elif [ -f /etc/init.d/sinusbot ]; then
+        /etc/init.d/sinusbot start
+        greenMessage "Started your bot with initd."
+      else
+        redMessage "Please start your bot normally"!
       fi
+      exit 0
     fi
-
-    if [[ -z $SINUSBOTUSER ]]; then
-      errorExit "No SinusBot found. Exiting now."
-    fi
-
-    redMessage "SinusBot will now be removed completely from your system"!
-
-    greenMessage "Your SinusBot user is \"$SINUSBOTUSER\"? After select Yes it could take a while."
-
-    OPTIONS=("Yes" "No")
-    select OPTION in "${OPTIONS[@]}"; do
-      case "$REPLY" in
-      1) break ;;
-      2) errorQuit ;;
-      *) errorContinue ;;
-      esac
-    done
-
-    if [ "$(ps ax | grep sinusbot | grep SCREEN)" ]; then
-      ps ax | grep sinusbot | grep SCREEN | awk '{print $1}' | while read PID; do
-        kill $PID
-      done
-    fi
-
-    if [ "$(ps ax | grep ts3bot | grep SCREEN)" ]; then
-      ps ax | grep ts3bot | grep SCREEN | awk '{print $1}' | while read PID; do
-        kill $PID
-      done
-    fi
-
-    if [ -f /lib/systemd/system/sinusbot.service ]; then
-      if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
-        service sinusbot stop 2>/dev/null
-        systemctl disable sinusbot 2>/dev/null
-      fi
-      rm /lib/systemd/system/sinusbot.service
-    elif [ -f /etc/init.d/sinusbot ]; then
-      if [ "$(/etc/init.d/sinusbot status | awk '{print $NF; exit}')" == "UP" ]; then
-        su -c "/etc/init.d/sinusbot stop" $SINUSBOTUSER
-        su -c "screen -wipe" $SINUSBOTUSER
-        update-rc.d -f sinusbot remove >/dev/null
-      fi
-      rm /etc/init.d/sinusbot
-    fi
-
-    if [ -f /etc/cron.d/sinusbot ]; then
-      rm /etc/cron.d/sinusbot
-    fi
-
-    if [ "$LOCATION" ]; then
-      rm -R $LOCATION >/dev/null
-      greenMessage "Files removed successfully"!
-    else
-      redMessage "Error while removing files."
-    fi
-
-    if [[ $SINUSBOTUSER != "root" ]]; then
-      redMessage "Remove user \"$SINUSBOTUSER\"?"
-
-      OPTIONS=("Yes" "No")
-      select OPTION in "${OPTIONS[@]}"; do
-        case "$REPLY" in
-        1 | 2) break ;;
-        *) errorContinue ;;
-        esac
-      done
-
-      if [ "$OPTION" == "Yes" ]; then
-        userdel -r -f $SINUSBOTUSER >/dev/null
-
-        if [ "$(id $SINUSBOTUSER 2>/dev/null)" == "" ]; then
-          greenMessage "User removed successfully"!
-        else
-          redMessage "Error while removing user"!
-        fi
-      fi
-    fi
-
-    greenMessage "SinusBot removed completely including all directories."
-
-    exit 0
-  fi
-
-  # Private usage only!
-
-  redMessage "This SinusBot version is only for private use! Accept?"
-
-  OPTIONS=("No" "Yes")
-  select OPTION in "${OPTIONS[@]}"; do
-    case "$REPLY" in
-    1) errorQuit ;;
-    2) break ;;
-    *) errorContinue ;;
-    esac
   done
 
-  # Ask for YT-DL
+fi
 
-  redMessage "Should YT-DL be installed/updated?"
-  OPTIONS=("Yes" "No")
-  select OPTION in "${OPTIONS[@]}"; do
-    case "$REPLY" in
-    1 | 2) break ;;
-    *) errorContinue ;;
-    esac
-  done
+# Check which OS
 
-  if [ "$OPTION" == "Yes" ]; then
-    YT="Yes"
-  fi
+if [ "$INSTALL" != "Rem" ]; then
 
-  # Setting server time
+  if [ -f /etc/centos-release ]; then
+    greenMessage "Installing redhat-lsb! Please wait."
+    yum -y -q install redhat-lsb
+    greenMessage "Done"!
 
-  if [ $(virt-what | grep "openvz") ]; then
-    redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
-  else
-    yellowMessage "Check your time below:"
-    date "+DATE: %m/%d/%y%nTIME: %H:%M:%S"
+    yellowMessage "You're running CentOS. Which firewallsystem you're using?"
 
-    OPTIONS=("Correct" "Incorrect")
+    OPTIONS=("IPtables" "Firewalld")
     select OPTION in "${OPTIONS[@]}"; do
       case "$REPLY" in
       1 | 2) break ;;
@@ -556,73 +248,195 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
       esac
     done
 
-    if [ "$OPTION" == "Incorrect" ]; then
-
-      if [ -f /etc/centos-release ]; then
-        service ntpd stop
-        ntpd -s 0.pool.ntp.org
-        service ntpd start
-        TIME=$(date)
-        greenMessage "Automatically set time to" $TIME!
-      else
-        if [ $OS != "ubuntu" ]; then
-          service ntp restart
-          timedatectl set-ntp yes
-          timedatectl >/dev/null
-          TIME=$(date)
-          greenMessage "Automatically set time to" $TIME!
-        elif [ $OS == "ubuntu" ]; then
-          redMessage "Can't set your date automatically. Please follow the following steps:"
-          read -rp "Day    (01-32): " DAY
-          read -rp "Month  (01-12): " MONTH
-          read -rp "Year   (2017):  " YEAR
-
-          redMessage "Choose your time format:"
-          OPTIONS=("12 hour" "24 hour")
-          select OPTION in "${OPTIONS[@]}"; do
-            case "$REPLY" in
-            1 | 2) break ;;
-            *) errorContinue ;;
-            esac
-          done
-
-          if [ "$OPTION" == "12 hour" ]; then
-            redMessage "AM or PM?"
-            OPTIONS=("AM" "PM")
-            select OPTION in "${OPTIONS[@]}"; do
-              case "$REPLY" in
-              1 | 2) break ;;
-              *) errorContinue ;;
-              esac
-            done
-
-            if [ "$OPTION" == "AM" ]; then
-              AMPM=AM
-            elif [ "$OPTION" == "PM" ]; then
-              AMPM=PM
-            fi
-
-            read -rp "Hour   (1-12):  " HOUR
-            read -rp "Minute (0-59):  " MINUTE
-            read -rp "Second (0-59):  " SECOND
-            date +%T%P -s "$HOUR:$MINUTE:$SECOND$AMPM"
-          elif [ "$OPTION" == "24 hour" ]; then
-            read -rp "Hour   (1-24):  " HOUR
-            read -rp "Minute (0-59):  " MINUTE
-            read -rp "Second (0-59):  " SECOND
-            date +%T -s "$HOUR:$MINUTE:$SECOND"
-          fi
-
-          date +%Y%m%d -s "$YEAR$MONTH$DAY"
-          hwclock -w
-        fi
-      fi
+    if [ "$OPTION" == "IPtables" ]; then
+      FIREWALL="ip"
+    elif [ "$OPTION" == "Firewalld" ]; then
+      FIREWALL="fd"
     fi
   fi
 
-  # Update packages or not
+  if [ -f /etc/debian_version ]; then
+    greenMessage "Check if lsb-release and debconf-utils is installed..."
+    apt-get -qq update
+    apt-get -qq install debconf-utils -y
+    apt-get -qq install lsb-release -y
+    greenMessage "Done"!
+  fi
 
-  redMessage 'Update the system packages to the latest version? Recommended, as otherwise dependencies might break! Option "No" will exit the installer'
+  # Functions from lsb_release
+
+  OS=$(lsb_release -i 2>/dev/null | grep 'Distributor' | awk '{print tolower($3)}')
+  OSBRANCH=$(lsb_release -c 2>/dev/null | grep 'Codename' | awk '{print $2}')
+
+  if [ $OS == "debian" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
+    apt-get -qq install dmidecode -y >/dev/null
+    wget -q http://ftp.debian.org/debian/pool/main/v/virt-what/virt-what_1.18-1_amd64.deb
+    dpkg -i ./virt-what_1.18-1_amd64.deb
+    rm virt-what_1.18-1_amd64.deb
+  elif [ $OS == "ubuntu" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
+    apt-get -qq install dmidecode -y >/dev/null
+    wget -q http://de.archive.ubuntu.com/ubuntu/pool/universe/v/virt-what/virt-what_1.18-1_amd64.deb
+    dpkg -i ./virt-what_1.18-1_amd64.deb
+    rm virt-what_1.18-1_amd64.deb
+  fi
+
+  if [ $(virt-what | grep "openvz") ]; then
+    redMessage "Warning, your server running under OpenVZ! This is an very old container system and isn't well supported by newer packages."
+  elif [ $(virt-what | grep "docker") ]; then
+    redMessage "Warning, your server running under Docker! Maybe there are failures while installing."
+  fi
+
+fi
+
+# Go on
+
+if [ "$INSTALL" != "Rem" ]; then
+  if [ -z "$OS" ]; then
+    errorExit "Error: Could not detect OS. Currently only Debian, Ubuntu and CentOS are supported. Aborting"!
+  elif [ -z "$OS" ] && ([ "$(cat /etc/debian_version | awk '{print $1}')" == "7" ] || [ $(cat /etc/debian_version | grep "7.") ]); then
+    errorExit "Debian 7 isn't supported anymore"!
+  fi
+
+  if [ -z "$OSBRANCH" ] && [ -f /etc/centos-release ]; then
+    errorExit "Error: Could not detect branch of OS. Aborting"
+  fi
+
+  if [ "$MACHINE" == "x86_64" ]; then
+    ARCH="amd64"
+  else
+    errorExit "$MACHINE is not supported"!
+  fi
+fi
+
+if [[ "$INSTALL" != "Rem" ]]; then
+  if [[ "$USE_SYSTEMD" == true ]]; then
+    yellowMessage "Automatically chosen system.d for your startscript"!
+  else
+    yellowMessage "Automatically chosen init.d for your startscript"!
+  fi
+fi
+
+# Set path or continue with normal
+
+yellowMessage "Automatic usage or own directories?"
+
+OPTIONS=("Automatic" "Own path" "Quit")
+select OPTION in "${OPTIONS[@]}"; do
+  case "$REPLY" in
+  1 | 2) break ;;
+  3) errorQuit ;;
+  *) errorContinue ;;
+  esac
+done
+
+if [ "$OPTION" == "Automatic" ]; then
+  LOCATION=/opt/sinusbot
+elif [ "$OPTION" == "Own path" ]; then
+  yellowMessage "Enter location where the bot should be installed/updated/removed. Like /opt/sinusbot. Include the / at first position and none at the end"!
+  LOCATION=""
+  while [[ ! -d $LOCATION ]]; do
+    read -rp "Location [/opt/sinusbot]: " LOCATION
+    if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
+      redMessage "Directory not found, try again"!
+    fi
+    if [ "$INSTALL" == "Inst" ]; then
+      if [ "$LOCATION" == "" ]; then
+        LOCATION=/opt/sinusbot
+      fi
+      makeDir $LOCATION
+    fi
+  done
+
+  greenMessage "Your directory is $LOCATION."
+
+  OPTIONS=("Yes" "No, change it" "Quit")
+  select OPTION in "${OPTIONS[@]}"; do
+    case "$REPLY" in
+    1 | 2) break ;;
+    3) errorQuit ;;
+    *) errorContinue ;;
+    esac
+  done
+
+  if [ "$OPTION" == "No, change it" ]; then
+    LOCATION=""
+    while [[ ! -d $LOCATION ]]; do
+      read -rp "Location [/opt/sinusbot]: " LOCATION
+      if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
+        redMessage "Directory not found, try again"!
+      fi
+      if [ "$INSTALL" == "Inst" ]; then
+        makeDir $LOCATION
+      fi
+    done
+
+    greenMessage "Your directory is $LOCATION."
+  fi
+fi
+
+LOCATIONex=$LOCATION/sinusbot
+
+# Check if SinusBot already installed and if update is possible
+
+if [[ $INSTALL == "Inst" ]]; then
+  if [[ -f $LOCATION/sinusbot ]]; then
+    redMessage "SinusBot already installed with automatic install option"!
+    read -rp "Would you like to update the bot instead? [Y / N]: " OPTION
+
+    if [ "$OPTION" == "Y" ] || [ "$OPTION" == "y" ] || [ "$OPTION" == "" ]; then
+      INSTALL="Updt"
+    elif [ "$OPTION" == "N" ] || [ "$OPTION" == "n" ]; then
+      errorExit "Installer stops now"!
+    fi
+  else
+    greenMessage "SinusBot isn't installed yet. Installer goes on."
+  fi
+
+elif [ "$INSTALL" == "Rem" ] || [ "$INSTALL" == "Updt" ]; then
+  if [ ! -d $LOCATION ]; then
+    errorExit "SinusBot isn't installed"!
+  else
+    greenMessage "SinusBot is installed. Installer goes on."
+  fi
+fi
+
+# Remove SinusBot
+
+if [ "$INSTALL" == "Rem" ]; then
+
+  SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
+
+  if [ -f /usr/local/bin/youtube-dl ]; then
+    redMessage "Remove YoutubeDL?"
+
+    OPTIONS=("Yes" "No")
+    select OPTION in "${OPTIONS[@]}"; do
+      case "$REPLY" in
+      1 | 2) break ;;
+      *) errorContinue ;;
+      esac
+    done
+
+    if [ "$OPTION" == "Yes" ]; then
+      if [ -f /usr/local/bin/youtube-dl ]; then
+        rm /usr/local/bin/youtube-dl
+      fi
+
+      if [ -f /etc/cron.d/ytdl ]; then
+        rm /etc/cron.d/ytdl
+      fi
+
+      greenMessage "Removed YT-DL successfully"!
+    fi
+  fi
+
+  if [[ -z $SINUSBOTUSER ]]; then
+    errorExit "No SinusBot found. Exiting now."
+  fi
+
+  redMessage "SinusBot will now be removed completely from your system"!
+
+  greenMessage "Your SinusBot user is \"$SINUSBOTUSER\"? After select Yes it could take a while."
 
   OPTIONS=("Yes" "No")
   select OPTION in "${OPTIONS[@]}"; do
@@ -633,22 +447,207 @@ if [ -f /etc/debian_version ] || [ -f /etc/centos-release ]; then
     esac
   done
 
-  greenMessage "Starting the installer now"!
-  sleep 2
+  if [ "$(ps ax | grep sinusbot | grep SCREEN)" ]; then
+    ps ax | grep sinusbot | grep SCREEN | awk '{print $1}' | while read PID; do
+      kill $PID
+    done
+  fi
 
-  if [ "$OPTION" == "Yes" ]; then
-    greenMessage "Updating the system in a few seconds"!
-    sleep 1
-    redMessage "This could take a while. Please wait up to 10 minutes"!
-    sleep 3
+  if [ "$(ps ax | grep ts3bot | grep SCREEN)" ]; then
+    ps ax | grep ts3bot | grep SCREEN | awk '{print $1}' | while read PID; do
+      kill $PID
+    done
+  fi
+
+  if [ -f /lib/systemd/system/sinusbot.service ]; then
+    if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
+      service sinusbot stop 2>/dev/null
+      systemctl disable sinusbot 2>/dev/null
+    fi
+    rm /lib/systemd/system/sinusbot.service
+  elif [ -f /etc/init.d/sinusbot ]; then
+    if [ "$(/etc/init.d/sinusbot status | awk '{print $NF; exit}')" == "UP" ]; then
+      su -c "/etc/init.d/sinusbot stop" $SINUSBOTUSER
+      su -c "screen -wipe" $SINUSBOTUSER
+      update-rc.d -f sinusbot remove >/dev/null
+    fi
+    rm /etc/init.d/sinusbot
+  fi
+
+  if [ -f /etc/cron.d/sinusbot ]; then
+    rm /etc/cron.d/sinusbot
+  fi
+
+  if [ "$LOCATION" ]; then
+    rm -R $LOCATION >/dev/null
+    greenMessage "Files removed successfully"!
+  else
+    redMessage "Error while removing files."
+  fi
+
+  if [[ $SINUSBOTUSER != "root" ]]; then
+    redMessage "Remove user \"$SINUSBOTUSER\"?"
+
+    OPTIONS=("Yes" "No")
+    select OPTION in "${OPTIONS[@]}"; do
+      case "$REPLY" in
+      1 | 2) break ;;
+      *) errorContinue ;;
+      esac
+    done
+
+    if [ "$OPTION" == "Yes" ]; then
+      userdel -r -f $SINUSBOTUSER >/dev/null
+
+      if [ "$(id $SINUSBOTUSER 2>/dev/null)" == "" ]; then
+        greenMessage "User removed successfully"!
+      else
+        redMessage "Error while removing user"!
+      fi
+    fi
+  fi
+
+  greenMessage "SinusBot removed completely including all directories."
+
+  exit 0
+fi
+
+# Private usage only!
+
+redMessage "This SinusBot version is only for private use! Accept?"
+
+OPTIONS=("No" "Yes")
+select OPTION in "${OPTIONS[@]}"; do
+  case "$REPLY" in
+  1) errorQuit ;;
+  2) break ;;
+  *) errorContinue ;;
+  esac
+done
+
+# Ask for YT-DL
+
+redMessage "Should YT-DL be installed/updated?"
+OPTIONS=("Yes" "No")
+select OPTION in "${OPTIONS[@]}"; do
+  case "$REPLY" in
+  1 | 2) break ;;
+  *) errorContinue ;;
+  esac
+done
+
+if [ "$OPTION" == "Yes" ]; then
+  YT="Yes"
+fi
+
+# Setting server time
+
+if [ $(virt-what | grep "openvz") ]; then
+  redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
+else
+  yellowMessage "Check your time below:"
+  date "+DATE: %m/%d/%y%nTIME: %H:%M:%S"
+
+  OPTIONS=("Correct" "Incorrect")
+  select OPTION in "${OPTIONS[@]}"; do
+    case "$REPLY" in
+    1 | 2) break ;;
+    *) errorContinue ;;
+    esac
+  done
+
+  if [ "$OPTION" == "Incorrect" ]; then
 
     if [ -f /etc/centos-release ]; then
-      yum -y -q update
-      yum -y -q upgrade
+      service ntpd stop
+      ntpd -s 0.pool.ntp.org
+      service ntpd start
+      TIME=$(date)
+      greenMessage "Automatically set time to" $TIME!
     else
-      apt-get -qq update
-      apt-get -qq upgrade
+      if [ $OS != "ubuntu" ]; then
+        service ntp restart
+        timedatectl set-ntp yes
+        timedatectl >/dev/null
+        TIME=$(date)
+        greenMessage "Automatically set time to" $TIME!
+      elif [ $OS == "ubuntu" ]; then
+        redMessage "Can't set your date automatically. Please follow the following steps:"
+        read -rp "Day    (01-32): " DAY
+        read -rp "Month  (01-12): " MONTH
+        read -rp "Year   (2017):  " YEAR
+
+        redMessage "Choose your time format:"
+        OPTIONS=("12 hour" "24 hour")
+        select OPTION in "${OPTIONS[@]}"; do
+          case "$REPLY" in
+          1 | 2) break ;;
+          *) errorContinue ;;
+          esac
+        done
+
+        if [ "$OPTION" == "12 hour" ]; then
+          redMessage "AM or PM?"
+          OPTIONS=("AM" "PM")
+          select OPTION in "${OPTIONS[@]}"; do
+            case "$REPLY" in
+            1 | 2) break ;;
+            *) errorContinue ;;
+            esac
+          done
+
+          if [ "$OPTION" == "AM" ]; then
+            AMPM=AM
+          elif [ "$OPTION" == "PM" ]; then
+            AMPM=PM
+          fi
+
+          read -rp "Hour   (1-12):  " HOUR
+          read -rp "Minute (0-59):  " MINUTE
+          read -rp "Second (0-59):  " SECOND
+          date +%T%P -s "$HOUR:$MINUTE:$SECOND$AMPM"
+        elif [ "$OPTION" == "24 hour" ]; then
+          read -rp "Hour   (1-24):  " HOUR
+          read -rp "Minute (0-59):  " MINUTE
+          read -rp "Second (0-59):  " SECOND
+          date +%T -s "$HOUR:$MINUTE:$SECOND"
+        fi
+
+        date +%Y%m%d -s "$YEAR$MONTH$DAY"
+        hwclock -w
+      fi
     fi
+  fi
+fi
+
+# Update packages or not
+
+redMessage 'Update the system packages to the latest version? Recommended, as otherwise dependencies might break! Option "No" will exit the installer'
+
+OPTIONS=("Yes" "No")
+select OPTION in "${OPTIONS[@]}"; do
+  case "$REPLY" in
+  1) break ;;
+  2) errorQuit ;;
+  *) errorContinue ;;
+  esac
+done
+
+greenMessage "Starting the installer now"!
+sleep 2
+
+if [ "$OPTION" == "Yes" ]; then
+  greenMessage "Updating the system in a few seconds"!
+  sleep 1
+  redMessage "This could take a while. Please wait up to 10 minutes"!
+  sleep 3
+
+  if [ -f /etc/centos-release ]; then
+    yum -y -q update
+    yum -y -q upgrade
+  else
+    apt-get -qq update
+    apt-get -qq upgrade
   fi
 fi
 
