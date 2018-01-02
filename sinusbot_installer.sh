@@ -795,6 +795,7 @@ if [ ! -d teamspeak3-client/plugins/ ]; then
   mkdir teamspeak3-client/plugins/
 fi
 
+# Copy the SinusBot plugin into the teamspeak clients plugin directory
 cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
 
 if [ -f teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so ]; then
