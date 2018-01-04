@@ -461,8 +461,8 @@ if [ "$INSTALL" == "Rem" ]; then
 
   if [ -f /lib/systemd/system/sinusbot.service ]; then
     if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
-      service sinusbot stop 2>/dev/null
-      systemctl disable sinusbot 2>/dev/null
+      service sinusbot stop
+      systemctl disable sinusbot
     fi
     rm /lib/systemd/system/sinusbot.service
   elif [ -f /etc/init.d/sinusbot ]; then
@@ -832,8 +832,8 @@ if [[ "$USE_SYSTEMD" == true ]]; then
   sed -i 's!ExecStart=YOURPATH_TO_THE_BOT_BINARY!ExecStart='$LOCATIONex'!g' /lib/systemd/system/sinusbot.service
   sed -i 's!WorkingDirectory=YOURPATH_TO_THE_BOT_DIRECTORY!WorkingDirectory='$LOCATION'!g' /lib/systemd/system/sinusbot.service
 
-  systemctl daemon-reload &>/dev/null
-  systemctl enable sinusbot.service &>/dev/null
+  systemctl daemon-reload
+  systemctl enable sinusbot.service
 
   greenMessage 'Installed systemd file to start the SinusBot with "service sinusbot {start|stop|status|restart}"'
 
