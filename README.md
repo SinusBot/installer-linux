@@ -1,5 +1,7 @@
 # SinusBot Installer for Linux
 
+[![Build Status](https://travis-ci.org/SinusBot/installer-linux.svg?branch=master)](https://travis-ci.org/SinusBot/installer-linux)
+
 ## Officially supported linux distributions
 
 - Debian 8+
