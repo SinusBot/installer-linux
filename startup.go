@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -67,10 +69,9 @@ func main() {
 	if err := config.Run(); err != nil {
 		log.Fatalf("could not run app: %v", err)
 	}
-
 }
 
-func (a *app) checkParameters(history []string, line string) error {
+func (a *app) checkParameters(line string) error {
 	for key := range a.Parameters {
 		if strings.Contains(line, a.Parameters[key].Detect) {
 			go func(value string) {
@@ -78,6 +79,16 @@ func (a *app) checkParameters(history []string, line string) error {
 				a.writeStdIn(value)
 			}(a.Parameters[key].Value)
 			break
+		}
+	}
+	r, err := regexp.Compile(`password = '(.*)'`)
+	if err != nil {
+		return errors.Wrap(err, "could not compile regexp")
+	}
+	pw := r.FindStringSubmatch(line)
+	if len(pw) == 2 {
+		if err := ioutil.WriteFile(".password", []byte(pw[1]), 0644); err != nil {
+			return errors.Wrap(err, "could not write password")
 		}
 	}
 	return nil
@@ -105,19 +116,18 @@ func (a *app) Run() error {
 	if err = cmd.Wait(); err != nil {
 		return errors.Wrap(err, "could not wait for process")
 	}
+	time.Sleep(time.Second)
 	return nil
 }
 
 func (a *app) cmdListeners() {
 	scanner := bufio.NewScanner(a.cmdStdout)
-	history := []string{}
 	for scanner.Scan() {
 		line := scanner.Text()
 		fmt.Println(line)
-		if err := a.checkParameters(history, line); err != nil {
+		if err := a.checkParameters(line); err != nil {
 			log.Fatalf("could not check parameters: %v", err)
 		}
-		history = append(history, line)
 	}
 }
 
