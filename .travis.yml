@@ -1,1 +1,7 @@
 language: go
+dist: trusty
+sudo: required
+script:
+  - go build startup.go
+  - sudo ./startup
+  - go test startup_test.go
