@@ -22,7 +22,6 @@ type parameter struct {
 type app struct {
 	FileName   string
 	Parameters []parameter
-	command    exec.Cmd
 	cmdStdout  io.Reader
 	cmdStdin   io.Writer
 }
