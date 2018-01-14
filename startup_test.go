@@ -25,6 +25,30 @@ func TestIsBotRunning(t *testing.T) {
 	}
 }
 
+func TestConnectToTeamspeak(t *testing.T) {
+	botId, err := getBotID()
+	if err != nil {
+		t.Fatalf("could not get botId: %v", err)
+	}
+	pw, err := ioutil.ReadFile(".password")
+	if err != nil {
+		t.Fatalf("could not read password file")
+	}
+	token, err := login("admin", string(pw), *botId)
+	if err != nil {
+		t.Fatalf("could not get token: %v", err)
+	}
+	bots, err := getInstances(*token)
+	if err != nil {
+		t.Fatalf("could not get instances: %v", err)
+	}
+	if err := changeSettings(bots[0].UUID, *token); err != nil {
+		t.Fatalf("could not change instance settings: %v", err)
+	}
+	fmt.Println("Sleeping so that the bot will connect in this time to the server")
+	time.Sleep(5 * time.Second)
+}
+
 func TestIsBotOnTeamspeak(t *testing.T) {
 	c, err := ts3.NewClient("julia.ts3index.com:10011")
 	if err != nil {
@@ -50,29 +74,6 @@ func TestIsBotOnTeamspeak(t *testing.T) {
 	}
 }
 
-func TestConnectToTeamspeak(t *testing.T) {
-	botId, err := getBotID()
-	if err != nil {
-		t.Fatalf("could not get botId: %v", err)
-	}
-	pw, err := ioutil.ReadFile(".password")
-	if err != nil {
-		t.Fatalf("could not read password file")
-	}
-	token, err := login("admin", string(pw), *botId)
-	if err != nil {
-		t.Fatalf("could not get token: %v", err)
-	}
-	bots, err := getInstances(*token)
-	if err != nil {
-		t.Fatalf("could not get instances: %v", err)
-	}
-	if err := changeSettings(bots[0].UUID, *token); err != nil {
-		t.Fatalf("could not change instance settings: %v", err)
-	}
-	time.Sleep(5 * time.Second)
-}
-
 func getInstances(token string) ([]instance, error) {
 	req, err := http.NewRequest("GET", "http://127.0.0.1:8087/api/v1/bot/instances", nil)
 	if err != nil {
@@ -87,7 +88,6 @@ func getInstances(token string) ([]instance, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, errors.Wrap(err, "could not decode json")
 	}
-	fmt.Println(data)
 	return data, nil
 }
 
@@ -102,14 +102,13 @@ func changeSettings(uuid, token string) error {
 		return errors.Wrap(err, "could not create request")
 	}
 	req.Header.Add("Authorization", "Bearer "+token)
+	req.Header.Add("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "could not do request")
 	}
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(bodyBytes))
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("invalid status code received by setting instance settings")
+		return fmt.Errorf("invalid status code received by setting instance settings: %d", resp.StatusCode)
 	}
 	req, err = http.NewRequest("POST", "http://127.0.0.1:8087/api/v1/bot/i/"+uuid+"/spawn", nil)
 	if err != nil {
