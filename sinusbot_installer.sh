@@ -271,13 +271,13 @@ if [ "$INSTALL" != "Rem" ]; then
   if [ $OS == "debian" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
     apt-get -qq install dmidecode -y >/dev/null
     wget -q http://ftp.debian.org/debian/pool/main/v/virt-what/virt-what_1.18-2_amd64.deb
-    dpkg -i ./virt-what_1.18-1_amd64.deb
-    rm virt-what_1.18-1_amd64.deb
+    dpkg -i ./virt-what_1.18-2_amd64.deb
+    rm virt-what_1.18-2_amd64.deb
   elif [ $OS == "ubuntu" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
     apt-get -qq install dmidecode -y >/dev/null
     wget -q http://de.archive.ubuntu.com/ubuntu/pool/universe/v/virt-what/virt-what_1.18-2_amd64.deb
-    dpkg -i ./virt-what_1.18-1_amd64.deb
-    rm virt-what_1.18-1_amd64.deb
+    dpkg -i ./virt-what_1.18-2_amd64.deb
+    rm virt-what_1.18-2_amd64.deb
   fi
 
   if [ $(virt-what | grep "openvz") ]; then
