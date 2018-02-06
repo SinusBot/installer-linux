@@ -951,11 +951,11 @@ fi
 # If startup failed, the script will start normal sinusbot without screen for looking about errors. If startup successed => installation done.
 IS_RUNNING=false
 if [[ "$USE_SYSTEMD" == true ]]; then
-  if [[ ($(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
+  if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
     IS_RUNNING=true
   fi
 elif [[ "$USE_SYSTEMD" == false ]]; then
-  if [[ ($(/etc/init.d/sinusbot status | awk '{print $NF; exit}') == "UP" ]]; then
+  if [[ $(/etc/init.d/sinusbot status | awk '{print $NF; exit}') == "UP" ]]; then
      IS_RUNNING=true
   fi
 fi
