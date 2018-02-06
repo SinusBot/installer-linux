@@ -542,77 +542,21 @@ fi
 if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
   redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
 else
-  yellowMessage "Check your time below:"
-  date "+DATE: %m/%d/%y%nTIME: %H:%M:%S"
-
-  OPTIONS=("Correct" "Incorrect")
-  select OPTION in "${OPTIONS[@]}"; do
-    case "$REPLY" in
-    1 | 2) break ;;
-    *) errorContinue ;;
-    esac
-  done
-
-  if [ "$OPTION" == "Incorrect" ]; then
-
-    if [ -f /etc/centos-release ]; then
-      service ntpd stop
-      ntpd -s 0.pool.ntp.org
-      service ntpd start
+  if [ -f /etc/centos-release ]; then
+    service ntpd stop
+    ntpd -s 0.pool.ntp.org
+    service ntpd start
+    TIME=$(date)
+    greenMessage "Automatically set time to" $TIME!
+  else
+    if [[ $(which timedatectl) != "" ]]; then
+      service ntp restart
+      timedatectl set-ntp yes
+      timedatectl
       TIME=$(date)
       greenMessage "Automatically set time to" $TIME!
     else
-      if [ $OS != "ubuntu" ]; then
-        service ntp restart
-        timedatectl set-ntp yes
-        timedatectl >/dev/null
-        TIME=$(date)
-        greenMessage "Automatically set time to" $TIME!
-      elif [ $OS == "ubuntu" ]; then
-        redMessage "Can't set your date automatically. Please follow the following steps:"
-        read -rp "Day    (01-32): " DAY
-        read -rp "Month  (01-12): " MONTH
-        read -rp "Year   (2017):  " YEAR
-
-        redMessage "Choose your time format:"
-        OPTIONS=("12 hour" "24 hour")
-        select OPTION in "${OPTIONS[@]}"; do
-          case "$REPLY" in
-          1 | 2) break ;;
-          *) errorContinue ;;
-          esac
-        done
-
-        if [ "$OPTION" == "12 hour" ]; then
-          redMessage "AM or PM?"
-          OPTIONS=("AM" "PM")
-          select OPTION in "${OPTIONS[@]}"; do
-            case "$REPLY" in
-            1 | 2) break ;;
-            *) errorContinue ;;
-            esac
-          done
-
-          if [ "$OPTION" == "AM" ]; then
-            AMPM=AM
-          elif [ "$OPTION" == "PM" ]; then
-            AMPM=PM
-          fi
-
-          read -rp "Hour   (1-12):  " HOUR
-          read -rp "Minute (0-59):  " MINUTE
-          read -rp "Second (0-59):  " SECOND
-          date +%T%P -s "$HOUR:$MINUTE:$SECOND$AMPM"
-        elif [ "$OPTION" == "24 hour" ]; then
-          read -rp "Hour   (1-24):  " HOUR
-          read -rp "Minute (0-59):  " MINUTE
-          read -rp "Second (0-59):  " SECOND
-          date +%T -s "$HOUR:$MINUTE:$SECOND"
-        fi
-
-        date +%Y%m%d -s "$YEAR$MONTH$DAY"
-        hwclock -w
-      fi
+      redMessage "Unable to configure your date automatically, the installation will still be attempted."
     fi
   fi
 fi
