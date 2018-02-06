@@ -86,7 +86,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
-if [[ $(which systemctl) == "" ]]; then
+if [[ $(command -v systemctl) == "" ]]; then
   USE_SYSTEMD=false
 fi
 
@@ -616,7 +616,7 @@ else
     TIME=$(date)
     greenMessage "Automatically set time to" $TIME!
   else
-    if [[ $(which timedatectl) != "" ]]; then
+    if [[ $(command -v timedatectl) != "" ]]; then
       service ntp restart
       timedatectl set-ntp yes
       timedatectl
