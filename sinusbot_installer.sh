@@ -556,7 +556,7 @@ else
       TIME=$(date)
       greenMessage "Automatically set time to" $TIME!
     else
-      redMessage "Can't set your date automatically because of timedatectlis not available. It will be tried to continue the installation."
+      redMessage "Unable to configure your date automatically, the installation will still be attempted."
     fi
   fi
 fi
