@@ -267,22 +267,19 @@ if [ "$INSTALL" != "Rem" ]; then
 
   OS=$(lsb_release -i 2>/dev/null | grep 'Distributor' | awk '{print tolower($3)}')
   OSBRANCH=$(lsb_release -c 2>/dev/null | grep 'Codename' | awk '{print $2}')
+  VIRTUALIZATION_TYPE=""
 
-  if [ $OS == "debian" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
-    apt-get -qq install dmidecode
-    wget -q http://ftp.debian.org/debian/pool/main/v/virt-what/virt-what_1.18-2_amd64.deb -O virt-what.deb
-    dpkg -i virt-what.deb
-    rm virt-what.deb
-  elif [ $OS == "ubuntu" ] && [ "$(dpkg-query -s virt-what 2>/dev/null)" == "" ]; then
-    apt-get -qq install dmidecode
-    wget -q http://de.archive.ubuntu.com/ubuntu/pool/universe/v/virt-what/virt-what_1.18-2_amd64.deb -O virt-what.deb
-    dpkg -i virt-what.deb
-    rm virt-what.deb
+  # Extracted from the virt-what sourcecode: http://git.annexia.org/?p=virt-what.git;a=blob_plain;f=virt-what.in;hb=HEAD
+  if [ -f "${root}/.dockerinit" ]; then
+    VIRTUALIZATION_TYPE="docker"
+  fi
+  if [ -d "${root}/proc/vz" -a ! -d "${root}/proc/bc" ]; then
+    VIRTUALIZATION_TYPE="openvz"
   fi
 
-  if [ $(virt-what | grep "openvz") ]; then
+  if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
     redMessage "Warning, your server running under OpenVZ! This is an very old container system and isn't well supported by newer packages."
-  elif [ $(virt-what | grep "docker") ]; then
+  elif [[ $VIRTUALIZATION_TYPE == "docker" ]]; then
     redMessage "Warning, your server running under Docker! Maybe there are failures while installing."
   fi
 
@@ -542,7 +539,7 @@ fi
 
 # Setting server time
 
-if [ $(virt-what | grep "openvz") ]; then
+if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
   redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
 else
   yellowMessage "Check your time below:"
