@@ -269,8 +269,9 @@ if [ "$INSTALL" != "Rem" ]; then
   OSBRANCH=$(lsb_release -c 2>/dev/null | grep 'Codename' | awk '{print $2}')
   VIRTUALIZATION_TYPE=""
 
+  # Extracted from the virt-what sourcecode: http://git.annexia.org/?p=virt-what.git;a=blob_plain;f=virt-what.in;hb=HEAD
   if [ -f "${root}/.dockerinit" ]; then
-	  VIRTUALIZATION_TYPE="docker"
+    VIRTUALIZATION_TYPE="docker"
   fi
   if [ -d "${root}/proc/vz" -a ! -d "${root}/proc/bc" ]; then
     VIRTUALIZATION_TYPE="openvz"
