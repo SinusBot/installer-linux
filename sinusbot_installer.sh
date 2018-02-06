@@ -549,7 +549,7 @@ else
     TIME=$(date)
     greenMessage "Automatically set time to" $TIME!
   else
-    if [[ $(which systemctl) != "" ]]; then
+    if [[ $(which timedatectl) != "" ]]; then
       service ntp restart
       timedatectl set-ntp yes
       timedatectl
