@@ -949,9 +949,18 @@ if [ -f /etc/centos-release ]; then
 fi
 
 # If startup failed, the script will start normal sinusbot without screen for looking about errors. If startup successed => installation done.
+IS_RUNNING=false
+if [[ "$USE_SYSTEMD" == true ]]; then
+  if [[ ($(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
+    IS_RUNNING=true
+  fi
+elif [[ "$USE_SYSTEMD" == false ]]; then
+  if [[ ($(/etc/init.d/sinusbot status | awk '{print $NF; exit}') == "UP" ]]; then
+     IS_RUNNING=true
+  fi
+fi
 
-if [[ ($(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" && "$USE_SYSTEMD" == true) || ($(/etc/init.d/sinusbot status | awk '{print $NF; exit}') == "UP" && "$USE_SYSTEMD" == false) ]]; then
-
+if [[ "$IS_RUNNING" == true ]]; then
   if [[ $INSTALL == "Inst" ]]; then
     greenMessage "Install done"!
   elif [[ $INSTALL == "Updt" ]]; then
