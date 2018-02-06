@@ -537,30 +537,6 @@ if [ "$OPTION" == "Yes" ]; then
   YT="Yes"
 fi
 
-# Setting server time
-
-if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
-  redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
-else
-  if [ -f /etc/centos-release ]; then
-    service ntpd stop
-    ntpd -s 0.pool.ntp.org
-    service ntpd start
-    TIME=$(date)
-    greenMessage "Automatically set time to" $TIME!
-  else
-    if [[ $(which timedatectl) != "" ]]; then
-      service ntp restart
-      timedatectl set-ntp yes
-      timedatectl
-      TIME=$(date)
-      greenMessage "Automatically set time to" $TIME!
-    else
-      redMessage "Unable to configure your date automatically, the installation will still be attempted."
-    fi
-  fi
-fi
-
 # Update packages or not
 
 redMessage 'Update the system packages to the latest version? Recommended, as otherwise dependencies might break! Option "No" will exit the installer'
@@ -627,6 +603,30 @@ else
 fi
 
 greenMessage "Packages installed"!
+
+# Setting server time
+
+if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
+  redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
+else
+  if [ -f /etc/centos-release ]; then
+    service ntpd stop
+    ntpd -s 0.pool.ntp.org
+    service ntpd start
+    TIME=$(date)
+    greenMessage "Automatically set time to" $TIME!
+  else
+    if [[ $(which timedatectl) != "" ]]; then
+      service ntp restart
+      timedatectl set-ntp yes
+      timedatectl
+      TIME=$(date)
+      greenMessage "Automatically set time to" $TIME!
+    else
+      redMessage "Unable to configure your date automatically, the installation will still be attempted."
+    fi
+  fi
+fi
 
 USERADD=$(which useradd)
 GROUPADD=$(which groupadd)
