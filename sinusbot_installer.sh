@@ -587,18 +587,15 @@ else
   errorExit "Could not detect latest TS3-Client version"
 fi
 
-#DOWNLOAD_URL="http://ftp.4players.de/pub/hosted/ts3/releases/3.1.4/TeamSpeak3-Client-linux_amd64-3.1.4.run"
-#VERSION="3.1.4"
-
-# Install necessary aptitudes for sinusbot.
+# Install necessary apt dependencies
 
 magentaMessage "Installing necessary packages. Please wait..."
 
 if [ -f /etc/centos-release ]; then
-  yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 >/dev/null
+  yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2
   update-ca-trust extract >/dev/null
 else
-  apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev -y >/dev/null
+  apt-get -y -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev
   update-ca-certificates >/dev/null
 fi
 
