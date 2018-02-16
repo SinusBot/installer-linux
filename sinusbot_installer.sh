@@ -376,6 +376,24 @@ LOCATIONex=$LOCATION/sinusbot
 # Check if SinusBot already installed and if update is possible
 
 if [[ $INSTALL == "Inst" ]]; then
+
+yellowMessage "Should I install TeamSpeak or only Discord Mode?"
+
+OPTIONS=("Both" "Only Discord" "Quit")
+select OPTION in "${OPTIONS[@]}"; do
+  case "$REPLY" in
+  1 | 2) break ;;
+  3) errorQuit ;;
+  *) errorContinue ;;
+  esac
+done
+
+if [ "$OPTION" == "Both" ]; then
+  DISCORD="false"
+else
+  DISCORD="true"
+fi
+
   if [[ -f $LOCATION/sinusbot ]]; then
     redMessage "SinusBot already installed with automatic install option"!
     read -rp "Would you like to update the bot instead? [Y / N]: " OPTION
@@ -570,6 +588,8 @@ fi
 
 # TeamSpeak3-Client latest check || Deactivated till botupdate
 
+if [ $DISCORD == "false" ]; then
+
 greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
 for VERSION in $(wget -q -O - http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1); do
@@ -587,9 +607,6 @@ else
   errorExit "Could not detect latest TS3-Client version"
 fi
 
-#DOWNLOAD_URL="http://ftp.4players.de/pub/hosted/ts3/releases/3.1.4/TeamSpeak3-Client-linux_amd64-3.1.4.run"
-#VERSION="3.1.4"
-
 # Install necessary aptitudes for sinusbot.
 
 magentaMessage "Installing necessary packages. Please wait..."
@@ -600,6 +617,20 @@ if [ -f /etc/centos-release ]; then
 else
   apt-get -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev -y >/dev/null
   update-ca-certificates >/dev/null
+fi
+
+else
+
+magentaMessage "Installing necessary packages. Please wait..."
+
+if [ -f /etc/centos-release ]; then
+  yum -y -q install ca-certificates bzip2 python wget >/dev/null
+  update-ca-trust extract >/dev/null
+else
+  apt-get -qq install ca-certificates bzip2 python wget -y >/dev/null
+  update-ca-certificates >/dev/null
+fi
+
 fi
 
 greenMessage "Packages installed"!
@@ -673,6 +704,8 @@ if [[ -f $LOCATION/ts3client_startscript.run ]]; then
   rm -rf $LOCATION/*
 fi
 
+if [ $DISCORD == "false" ]; then
+
 makeDir $LOCATION/teamspeak3-client
 
 chmod 750 -R $LOCATION
@@ -714,6 +747,7 @@ if [ -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run ]; then
 
   greenMessage "TS3 client install done."
 fi
+fi
 
 # Downloading latest SinusBot.
 
@@ -732,6 +766,8 @@ greenMessage "Extracting SinusBot files."
 su -c "tar -xjf sinusbot.current.tar.bz2" $SINUSBOTUSER
 rm -f sinusbot.current.tar.bz2
 
+if [ $DISCORD == "false" ]; then
+
 if [ ! -d teamspeak3-client/plugins/ ]; then
   mkdir teamspeak3-client/plugins/
 fi
@@ -741,6 +777,7 @@ cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
 
 if [ -f teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so ]; then
   rm teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so
+fi
 fi
 
 chmod 755 sinusbot
@@ -807,15 +844,26 @@ fi
 cd $LOCATION
 
 if [ "$INSTALL" == "Inst" ]; then
-  if [[ ! -f $LOCATION/config.ini ]]; then
-    echo 'ListenPort = 8087
-    ListenHost = "0.0.0.0"
-    TS3Path = "'$LOCATION'/teamspeak3-client/ts3client_linux_amd64"
-    YoutubeDLPath = ""' >>$LOCATION/config.ini
-    greenMessage "config.ini created successfully."
+  if [ $DISCORD == "false" ]; then
+    if [[ ! -f $LOCATION/config.ini ]]; then
+      echo 'ListenPort = 8087
+      ListenHost = "0.0.0.0"
+      TS3Path = "'$LOCATION'/teamspeak3-client/ts3client_linux_amd64"
+      YoutubeDLPath = ""' >>$LOCATION/config.ini
+      greenMessage "config.ini created successfully."
+    else
+      redMessage "config.ini already exists or creation error"!
+    fi
   else
-    redMessage "config.ini already exists or creation error"!
-  fi
+    if [[ ! -f $LOCATION/config.ini ]]; then
+      echo 'ListenPort = 8087
+      ListenHost = "0.0.0.0"
+      TS3Path = ""
+      YoutubeDLPath = ""' >>$LOCATION/config.ini
+      greenMessage "config.ini created successfully."
+    else
+      redMessage "config.ini already exists or creation error"!
+    fi
 fi
 
 if [[ -f /etc/cron.d/sinusbot ]]; then
