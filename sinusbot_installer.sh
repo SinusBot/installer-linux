@@ -864,6 +864,7 @@ if [ "$INSTALL" == "Inst" ]; then
     else
       redMessage "config.ini already exists or creation error"!
     fi
+  fi
 fi
 
 if [[ -f /etc/cron.d/sinusbot ]]; then
