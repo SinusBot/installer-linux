@@ -39,6 +39,10 @@ func main() {
 				Detect: "Automatic usage or own directories?",
 			},
 			parameter{
+				Value:  "1",
+				Detect: "Should I install TeamSpeak or only Discord Mode?",
+			},
+			parameter{
 				Value:  "2",
 				Detect: "This SinusBot version is only for private use! Accept?",
 			},
