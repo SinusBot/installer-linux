@@ -377,7 +377,7 @@ LOCATIONex=$LOCATION/sinusbot
 
 # Check if SinusBot already installed and if update is possible
 
-if [[ $INSTALL == "Inst" ]]; then
+if [[ $INSTALL == "Inst" ]] || [[ $INSATLL == "Updt" ]]; then
 
 yellowMessage "Should I install TeamSpeak or only Discord Mode?"
 
@@ -395,6 +395,9 @@ if [ "$OPTION" == "Both" ]; then
 else
   DISCORD="true"
 fi
+fi
+
+if [[ $INSTALL == "Inst" ]]; then
 
   if [[ -f $LOCATION/sinusbot ]]; then
     redMessage "SinusBot already installed with automatic install option"!
@@ -590,7 +593,7 @@ fi
 
 # TeamSpeak3-Client latest check || Deactivated till botupdate
 
-if [ $DISCORD == "false" ]; then
+if [ "$DISCORD" == "false" ]; then
 
 greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
@@ -669,6 +672,9 @@ ipaddress=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
 
 if [ "$INSTALL" == "Updt" ]; then
   SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
+  if [ "$DISCORD" == "false" ]; then
+    sed -i "s|TS3Path = \"\"|TS3Path = \"$LOCATION/teamspeak3-client/ts3client_linux_amd64\"|g" $LOCATION/config.ini && greenMessage "Added TS3 Path to config." || redMessage "Error while updating config"
+  fi
 else
 
   cyanMessage 'Please enter the name of the sinusbot user. Typically "sinusbot". If it does not exists, the installer will create it.'
@@ -695,6 +701,10 @@ else
   else
     greenMessage "User \"$SINUSBOTUSER\" already exists."
   fi
+
+chmod 750 -R $LOCATION
+chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
+
 fi
 
 # Create dirs or remove them.
@@ -706,7 +716,7 @@ if [[ -f $LOCATION/ts3client_startscript.run ]]; then
   rm -rf $LOCATION/*
 fi
 
-if [ $DISCORD == "false" ]; then
+if [ "$DISCORD" == "false" ]; then
 
 makeDir $LOCATION/teamspeak3-client
 
@@ -768,7 +778,7 @@ greenMessage "Extracting SinusBot files."
 su -c "tar -xjf sinusbot.current.tar.bz2" $SINUSBOTUSER
 rm -f sinusbot.current.tar.bz2
 
-if [ $DISCORD == "false" ]; then
+if [ "$DISCORD" == "false" ]; then
 
 if [ ! -d teamspeak3-client/plugins/ ]; then
   mkdir teamspeak3-client/plugins/
@@ -846,7 +856,7 @@ fi
 cd $LOCATION
 
 if [ "$INSTALL" == "Inst" ]; then
-  if [ $DISCORD == "false" ]; then
+  if [ "$DISCORD" == "false" ]; then
     if [[ ! -f $LOCATION/config.ini ]]; then
       echo 'ListenPort = 8087
       ListenHost = "0.0.0.0"
