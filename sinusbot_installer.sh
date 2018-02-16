@@ -371,6 +371,8 @@ elif [ "$OPTION" == "Own path" ]; then
   fi
 fi
 
+makeDir $LOCATION
+
 LOCATIONex=$LOCATION/sinusbot
 
 # Check if SinusBot already installed and if update is possible
