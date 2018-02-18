@@ -270,10 +270,10 @@ if [ "$INSTALL" != "Rem" ]; then
   VIRTUALIZATION_TYPE=""
 
   # Extracted from the virt-what sourcecode: http://git.annexia.org/?p=virt-what.git;a=blob_plain;f=virt-what.in;hb=HEAD
-  if [ -f "${root}/.dockerinit" ]; then
+  if [ -f "/.dockerinit" ]; then
     VIRTUALIZATION_TYPE="docker"
   fi
-  if [ -d "${root}/proc/vz" -a ! -d "${root}/proc/bc" ]; then
+  if [ -d "/proc/vz" -a ! -d "/proc/bc" ]; then
     VIRTUALIZATION_TYPE="openvz"
   fi
 
