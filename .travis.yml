@@ -2,6 +2,7 @@ language: go
 dist: xenial
 sudo: required
 script:
+  - sleep 10
   - go build startup.go
   - sudo ./startup
   - go test -v startup_test.go
