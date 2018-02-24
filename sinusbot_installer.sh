@@ -377,7 +377,7 @@ LOCATIONex=$LOCATION/sinusbot
 
 # Check if SinusBot already installed and if update is possible
 
-if [[ $INSTALL == "Inst" ]] || [[ $INSATLL == "Updt" ]]; then
+if [[ $INSTALL == "Inst" ]] || [[ $INSTALL == "Updt" ]]; then
 
 yellowMessage "Should I install TeamSpeak or only Discord Mode?"
 
