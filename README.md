@@ -39,6 +39,14 @@ The duration of the installation process depends on your system (how many packag
 
 [![Watch video](https://img.youtube.com/vi/_GEd_ert7PA/0.jpg)](https://www.youtube.com/watch?v=_GEd_ert7PA)
 
+## Installation
+
+```bash
+bash <(wget --no-check-certificate -O - 'https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh')
+```
+
+This command basically downloads the latest version of the installer-script and executes it via the bash.
+
 ## Contribution
 
 If you want to contribute, the sourcecode is formatted with the [shell-format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format) extension from VS Code.
