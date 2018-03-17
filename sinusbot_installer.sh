@@ -63,6 +63,11 @@ err_report() {
 
 trap 'err_report $LINENO' ERR
 
+# Check if the script was run as root user. Otherwise exit the script
+if [ "$(id -u)" != "0" ]; then
+  errorExit "Change to root account required!"
+fi
+
 # Update notify
 
 cyanMessage "Checking for the latest latest installer version"
@@ -78,11 +83,6 @@ if [ "$(printf "${LATEST_VERSION}\\n${Instversion}" | sort -V | tail -n 1)" != "
 else
   greenMessage "Your installer is up-to-date."
   sleep 1
-fi
-
-# Check if the script was run as root user. Otherwise exit the script
-if [ "$(id -u)" != "0" ]; then
-  errorExit "Change to root account required!"
 fi
 
 # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
