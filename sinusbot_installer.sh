@@ -52,6 +52,12 @@ function makeDir() {
 
 err_report() {
   FAILED_COMMAND=$(wget -q -O - https://raw.githubusercontent.com/Sinusbot/installer-linux/master/sinusbot_installer.sh | sed -e "$1q;d")
+  FAILED_COMMAND=${FAILED_COMMAND/ -qq}
+  FAILED_COMMAND=${FAILED_COMMAND/ -q}
+  FAILED_COMMAND=${FAILED_COMMAND/ -s}
+  FAILED_COMMAND=${FAILED_COMMAND/ 2\>\/dev\/null\/}
+  FAILED_COMMAND=${FAILED_COMMAND/ 2\>&1}
+  FAILED_COMMAND=${FAILED_COMMAND/ \>\/dev\/null}
   redMessage "Error on line $1. Report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script."
   if [[ "$FAILED_COMMAND" == "" ]]; then
     redMessage "Failed command: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L""$1"
