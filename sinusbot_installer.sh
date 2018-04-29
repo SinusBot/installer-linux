@@ -273,6 +273,7 @@ if [ "$INSTALL" != "Rem" ]; then
 
   OS=$(lsb_release -i 2>/dev/null | grep 'Distributor' | awk '{print tolower($3)}')
   OSBRANCH=$(lsb_release -c 2>/dev/null | grep 'Codename' | awk '{print $2}')
+  OSRELEASE=$(lsb_release -r 2>/dev/null | grep 'Release' | awk '{print $2}')
   VIRTUALIZATION_TYPE=""
 
   # Extracted from the virt-what sourcecode: http://git.annexia.org/?p=virt-what.git;a=blob_plain;f=virt-what.in;hb=HEAD
@@ -623,10 +624,16 @@ fi
 magentaMessage "Installing necessary packages. Please wait..."
 
 if [ -f /etc/centos-release ]; then
-  yum -y -q install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 >/dev/null
+  yum -y -q install screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 >/dev/null
   update-ca-trust extract >/dev/null
 else
-  apt-get -y -qq install screen x11vnc xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 >/dev/null
+  # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
+  if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
+    apt-get -y install chrony
+  else
+    apt-get -y install ntp
+  fi
+  apt-get -y -qq install screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 >/dev/null
   update-ca-certificates >/dev/null
 fi
 
@@ -652,10 +659,18 @@ if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
   redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
 else
   if [ -f /etc/centos-release ]; then
-    service ntpd stop
-    ntpd -s 0.pool.ntp.org
-    service ntpd start
-    TIME=$(date)
+    if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
+      if [[ $(chronyc -a 'burst 4/4') == "200 OK" ]]; then
+        TIME=$(date)
+      else
+        errorExit "Error while setting time via chrony"!
+      fi
+    else
+      service ntpd stop
+      ntpd -s 0.pool.ntp.org
+      service ntpd start
+      TIME=$(date)
+    fi
     greenMessage "Automatically set time to" $TIME!
   else
     if [[ $(command -v timedatectl) != "" ]]; then
