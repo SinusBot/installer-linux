@@ -662,6 +662,7 @@ if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
 else
   if [ -f /etc/centos-release ] || [ $(cat /etc/*release | grep "DISTRIB_ID=" | sed 's/DISTRIB_ID=//g') ]; then
     if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
+      systemctl start chronyd
       if [[ $(chronyc -a 'burst 4/4') == "200 OK" ]]; then
         TIME=$(date)
       else
