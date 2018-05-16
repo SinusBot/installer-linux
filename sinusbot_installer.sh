@@ -604,20 +604,22 @@ if [ "$DISCORD" == "false" ]; then
 
 greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-for VERSION in $(wget -q -O - http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1); do
-  DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
-  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
-  if [ "$STATUS" == "200" ]; then
-    DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
-    break
-  fi
-done
+#for VERSION in $(wget -q -O - http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1); do
+#  DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
+#  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
+#  if [ "$STATUS" == "200" ]; then
+#    DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
+#    break
+#  fi
+#done
 
-if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
+VERSION="3.1.9"
+
+#if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
   greenMessage "Detected latest TS3-Client version as $VERSION"
-else
-  errorExit "Could not detect latest TS3-Client version"
-fi
+#else
+#  errorExit "Could not detect latest TS3-Client version"
+#fi
 
 # Install necessary aptitudes for sinusbot.
 
@@ -658,7 +660,7 @@ greenMessage "Packages installed"!
 if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
   redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
 else
-  if [ -f /etc/centos-release ]; then
+  if [ -f /etc/centos-release ] || [ $(cat /etc/*release | grep "DISTRIB_ID=" | sed 's/DISTRIB_ID=//g') ]; then
     if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
       if [[ $(chronyc -a 'burst 4/4') == "200 OK" ]]; then
         TIME=$(date)
