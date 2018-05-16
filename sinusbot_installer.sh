@@ -611,7 +611,7 @@ VERSION="3.1.9"
   STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
   if [ "$STATUS" == "200" ]; then
     DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
-    break
+    #break
   fi
 #done
 
