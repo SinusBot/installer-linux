@@ -4,7 +4,7 @@
 # Vars
 
 MACHINE=$(uname -m)
-Instversion="1.4"
+Instversion="1.5"
 
 USE_SYSTEMD=true
 
