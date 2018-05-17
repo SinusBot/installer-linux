@@ -669,9 +669,9 @@ else
         errorExit "Error while setting time via chrony"!
       fi
     else
-      service ntpd stop
+      service ntp stop
       ntpd -s 0.pool.ntp.org
-      service ntpd start
+      service ntp start
       TIME=$(date)
     fi
     greenMessage "Automatically set time to" $TIME!
