@@ -1,8 +1,11 @@
 language: go
 dist: xenial
 sudo: required
+addons:
+    apt:
+      update: true
 script:
-  - sleep 15
+  - sleep 5
   - go build startup.go
   - sudo ./startup
   - go test -v startup_test.go
