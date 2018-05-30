@@ -675,7 +675,11 @@ else
        service ntp stop
       fi
       ntpd -s 0.pool.ntp.org
-      service ntp start
+      if [ -f /etc/centos-release ]; then
+       service ntpd start
+      else
+       service ntp start
+      fi
       TIME=$(date)
     fi
     greenMessage "Automatically set time to" $TIME!
