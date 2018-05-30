@@ -669,7 +669,11 @@ else
         errorExit "Error while setting time via chrony"!
       fi
     else
-      service ntp stop
+      if [ -f /etc/centos-release ]; then
+       service ntpd stop
+      else
+       service ntp stop
+      fi
       ntpd -s 0.pool.ntp.org
       service ntp start
       TIME=$(date)
