@@ -924,7 +924,7 @@ if [ "$YT" == "Yes" ]; then
     redMessage "Cronjob already set for YT-DL updater"!
   else
     greenMessage "Installing Cronjob for automatic YT-DL update..."
-    printf "SHELL=/bin/sh\nPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n0 0 * * * $SINUSBOTUSER youtube-dl -U --restrict-filename > /dev/null 2>&1" >>/etc/cron.d/ytdl
+    printf "SHELL=/bin/sh\nPATH=/usr/local/bin/\n0 0 * * * $SINUSBOTUSER youtube-dl -U --restrict-filename > /dev/null 2>&1" >>/etc/cron.d/ytdl
     greenMessage "Installing Cronjob successful."
   fi
 
