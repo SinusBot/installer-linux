@@ -912,11 +912,8 @@ if [ "$INSTALL" == "Inst" ]; then
 fi
 
 if [[ -f /etc/cron.d/sinusbot ]]; then
-  redMessage "Cronjob already set for SinusBot updater"!
-else
-  greenMessage "Installing Cronjob for automatic SinusBot update..."
-  echo "0 0 * * * $SINUSBOTUSER $LOCATION/sinusbot -update >/dev/null" >>/etc/cron.d/sinusbot
-  greenMessage "Installing SinusBot update cronjob successful."
+  rm /etc/cron.d/sinusbot
+  redMessage "Sinusbot does not support the 'update' option"!
 fi
 
 # Installing YT-DL.
@@ -927,7 +924,7 @@ if [ "$YT" == "Yes" ]; then
     redMessage "Cronjob already set for YT-DL updater"!
   else
     greenMessage "Installing Cronjob for automatic YT-DL update..."
-    echo "0 0 * * * $SINUSBOTUSER youtube-dl -U --restrict-filename >/dev/null" >>/etc/cron.d/ytdl
+    printf "SHELL=/bin/sh\nPATH=/usr/local/bin/\n0 0 * * * $SINUSBOTUSER youtube-dl -U --restrict-filename > /dev/null 2>&1" >>/etc/cron.d/ytdl
     greenMessage "Installing Cronjob successful."
   fi
 
