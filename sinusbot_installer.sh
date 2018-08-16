@@ -604,9 +604,9 @@ if [ "$DISCORD" == "false" ]; then
 
 greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-VERSION="3.1.9"
+#VERSION="3.1.9"
 
-#for VERSION in $(wget -q -O - http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1); do
+for VERSION in $(wget -q -O - http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1); do
   DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
   STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
   if [ "$STATUS" == "200" ]; then
@@ -623,7 +623,7 @@ VERSION="3.1.9"
   done
   
   fi
-#done
+done
 
 if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
   greenMessage "Detected latest TS3-Client version as $VERSION"
