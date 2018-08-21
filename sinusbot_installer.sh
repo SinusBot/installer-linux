@@ -598,32 +598,20 @@ if [ "$OPTION" == "Yes" ]; then
   fi
 fi
 
-# TeamSpeak3-Client latest check || Deactivated till botupdate
+# TeamSpeak3-Client latest check
 
 if [ "$DISCORD" == "false" ]; then
 
 greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-#VERSION="3.1.9"
+VERSION=$(wget -O - 'https://sinusbot-installer.de/ts3version') 
 
-for VERSION in $(wget -q -O - http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -1); do
-  DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
-  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
+DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
+ STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
   if [ "$STATUS" == "200" ]; then
     DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
     break
-  else 
-  for VERSION in $(wget -q -O - http://dl.4players.de/ts/releases/ | grep -Po '(?<=href=")[0-9]+(\.[0-9]+){2,3}(?=/")' | sort -Vr | head -2 | tail -n 1); do
-  DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
-  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
-  if [ "$STATUS" == "200" ]; then
-    DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
-    break
-  fi 
-  done
-  
   fi
-done
 
 if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
   greenMessage "Detected latest TS3-Client version as $VERSION"
