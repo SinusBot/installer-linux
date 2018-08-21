@@ -610,7 +610,6 @@ DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Clie
  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
   if [ "$STATUS" == "200" ]; then
     DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
-    break
   fi
 
 if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
