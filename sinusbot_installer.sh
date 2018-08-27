@@ -908,13 +908,13 @@ if [ "$INSTALL" == "Inst" ]; then
   fi
 fi
 
-if [[ -f /etc/cron.d/sinusbot ]]; then
-  redMessage "Cronjob already set for SinusBot updater"!
-else
-  greenMessage "Installing Cronjob for automatic SinusBot update..."
-  echo "0 0 * * * $SINUSBOTUSER $LOCATION/sinusbot -update >/dev/null" >>/etc/cron.d/sinusbot
-  greenMessage "Installing SinusBot update cronjob successful."
-fi
+#if [[ -f /etc/cron.d/sinusbot ]]; then
+#  redMessage "Cronjob already set for SinusBot updater"!
+#else
+#  greenMessage "Installing Cronjob for automatic SinusBot update..."
+#  echo "0 0 * * * $SINUSBOTUSER $LOCATION/sinusbot -update >/dev/null" >>/etc/cron.d/sinusbot
+#  greenMessage "Installing SinusBot update cronjob successful."
+#fi
 
 # Installing YT-DL.
 
