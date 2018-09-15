@@ -920,6 +920,10 @@ fi
 
 if [ "$YT" == "Yes" ]; then
   greenMessage "Installing YT-Downloader now"!
+  if [ "$(cat /etc/cron.d/ytdl)" == "0 0 * * * $SINUSBOTUSER youtube-dl -U --restrict-filename >/dev/null" ]; then
+        rm /etc/cron.d/ytdl
+        yellowMessage "Deleted old YT-DL cronjob. Generating new one in a second."
+  fi
   if [ -f /etc/cron.d/ytdl ] && [ "$(grep -c 'youtube' /etc/cron.d/ytdl)" -ge 1 ]; then
     redMessage "Cronjob already set for YT-DL updater"!
   else
