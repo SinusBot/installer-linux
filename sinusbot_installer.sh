@@ -717,6 +717,9 @@ else
     if [ -n "$SINUSBOTUSER" ]; then
       greenMessage "Your sinusbot user is: $SINUSBOTUSER"
     fi
+    if [ $SINUSBOTUSER == "root" ]; then
+      redMessage "Error. Your username is invalid. Don't use root"!
+    fi
   done
 
   if [ "$(id $SINUSBOTUSER 2>/dev/null)" == "" ]; then
