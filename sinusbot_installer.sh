@@ -463,7 +463,7 @@ if [ "$INSTALL" == "Rem" ]; then
 
   redMessage "SinusBot will now be removed completely from your system"!
 
-  greenMessage "Your SinusBot user is \"$SINUSBOTUSER\"? After select Yes it could take a while."
+  greenMessage "Your SinusBot user is \"$SINUSBOTUSER\"? The directory which will be removed is \"$LOCATION\". After select Yes it could take a while."
 
   OPTIONS=("Yes" "No")
   select OPTION in "${OPTIONS[@]}"; do
@@ -513,7 +513,7 @@ if [ "$INSTALL" == "Rem" ]; then
   fi
 
   if [[ $SINUSBOTUSER != "root" ]]; then
-    redMessage "Remove user \"$SINUSBOTUSER\"?"
+    redMessage "Remove user \"$SINUSBOTUSER\"? (User will be removed from your system)"
 
     OPTIONS=("Yes" "No")
     select OPTION in "${OPTIONS[@]}"; do
