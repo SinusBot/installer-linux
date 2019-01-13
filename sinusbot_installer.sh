@@ -76,7 +76,7 @@ fi
 
 # Update notify
 
-cyanMessage "Checking for the latest latest installer version"
+cyanMessage "Checking for the latest installer version"
 if [ -f /etc/centos-release ]; then
   yum -y -q install wget
 else
@@ -606,7 +606,7 @@ greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with 
 
 VERSION="3.2.3"
 
-#VERSION=$(wget -qO - 'https://sinusbot-installer.de/ts3version') 
+#VERSION=$(wget -qO - 'https://sinusbot-installer.de/ts3version')
 
 DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
