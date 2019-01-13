@@ -1,4 +1,4 @@
-# SinusBot Installer for Linux
+# SinusBot installer for Linux
 
 [![Build Status](https://travis-ci.org/SinusBot/installer-linux.svg?branch=master)](https://travis-ci.org/SinusBot/installer-linux)
 

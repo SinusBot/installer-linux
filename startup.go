@@ -32,7 +32,7 @@ func main() {
 		Parameters: []parameter{
 			parameter{
 				Value:  "1",
-				Detect: "What should the Installer do?",
+				Detect: "What should the installer do?",
 			},
 			parameter{
 				Value:  "1",

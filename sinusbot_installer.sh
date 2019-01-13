@@ -1,5 +1,5 @@
 #!/bin/bash
-# SinusBot Installer by Philipp Eßwein - DAThosting.eu philipp.esswein@dathosting.eu
+# SinusBot installer by Philipp Eßwein - DAThosting.eu philipp.esswein@dathosting.eu
 
 # Vars
 
@@ -76,7 +76,7 @@ fi
 
 # Update notify
 
-cyanMessage "Checking for the latest latest installer version"
+cyanMessage "Checking for the latest installer version"
 if [ -f /etc/centos-release ]; then
   yum -y -q install wget
 else
@@ -85,7 +85,7 @@ fi
 LATEST_VERSION=$(wget --no-check-certificate --timeout=60 -qO - https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=Instversion=")([0-9]\.[0-9]+)')
 
 if [ "$(printf "${LATEST_VERSION}\\n${Instversion}" | sort -V | tail -n 1)" != "$Instversion" ]; then
-  errorExit "Outdated installer ${Instversion}. Upgrade your installer to version ${LATEST_VERSION}. Or reuse https://sinusbot-installer.de"
+  errorExit "Outdated installer ${Instversion}. Upgrade your installer to version ${LATEST_VERSION} or reuse https://sinusbot-installer.de"
 else
   greenMessage "Your installer is up-to-date."
   sleep 1
@@ -98,7 +98,7 @@ fi
 
 # If the linux distribution is not debian and centos, then exit
 if [ ! -f /etc/debian_version ] && [ ! -f /etc/centos-release ]; then
-  errorExit 'Not supported linux distribution. Only Debian and CentOS are currently supported'!
+  errorExit "Not supported linux distribution. Only Debian and CentOS are currently supported"!
 fi
 
 greenMessage "This is the automatic installer for latest SinusBot. USE AT YOUR OWN RISK"!
@@ -109,10 +109,10 @@ redMessage "Installer by Philipp Esswein | DAThosting.eu - Your game-/voiceserve
 sleep 1
 magentaMessage "Please rate this script at: https://forum.sinusbot.com/resources/sinusbot-installer-script.58/"
 sleep 1
-yellowMessage "You're using Installer $Instversion"
+yellowMessage "You're using installer $Instversion"
 
 # selection menu if the installer should install, update, remove or pw reset the SinusBot
-redMessage "What should the Installer do?"
+redMessage "What should the installer do?"
 OPTIONS=("Install" "Update" "Remove" "PW Reset" "Quit")
 select OPTION in "${OPTIONS[@]}"; do
   case "$REPLY" in
@@ -244,7 +244,7 @@ if [ "$INSTALL" != "Rem" ]; then
     yum -y -q install redhat-lsb
     greenMessage "Done"!
 
-    yellowMessage "You're running CentOS. Which firewallsystem you're using?"
+    yellowMessage "You're running CentOS. Which firewallsystem are you using?"
 
     OPTIONS=("IPtables" "Firewalld")
     select OPTION in "${OPTIONS[@]}"; do
@@ -285,9 +285,9 @@ if [ "$INSTALL" != "Rem" ]; then
   fi
 
   if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
-    redMessage "Warning, your server running under OpenVZ! This is an very old container system and isn't well supported by newer packages."
+    redMessage "Warning, your server is running OpenVZ! This very old container system isn't well supported by newer packages."
   elif [[ $VIRTUALIZATION_TYPE == "docker" ]]; then
-    redMessage "Warning, your server running under Docker! Maybe there are failures while installing."
+    redMessage "Warning, your server is running Docker! Maybe there are failures while installing."
   fi
 
 fi
@@ -336,7 +336,7 @@ done
 if [ "$OPTION" == "Automatic" ]; then
   LOCATION=/opt/sinusbot
 elif [ "$OPTION" == "Own path" ]; then
-  yellowMessage "Enter location where the bot should be installed/updated/removed. Like /opt/sinusbot. Include the / at first position and none at the end"!
+  yellowMessage "Enter location where the bot should be installed/updated/removed, e.g. /opt/sinusbot. Include the / at first position and none at the end"!
   LOCATION=""
   while [[ ! -d $LOCATION ]]; do
     read -rp "Location [/opt/sinusbot]: " LOCATION
@@ -606,7 +606,7 @@ greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with 
 
 VERSION="3.2.3"
 
-#VERSION=$(wget -qO - 'https://sinusbot-installer.de/ts3version') 
+#VERSION=$(wget -qO - 'https://sinusbot-installer.de/ts3version')
 
 DOWNLOAD_URL_VERSION="http://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
