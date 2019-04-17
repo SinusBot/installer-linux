@@ -604,7 +604,7 @@ if [ "$DISCORD" == "false" ]; then
 
 greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-VERSION="3.2.3"
+VERSION="3.2.5"
 
 #VERSION=$(wget -qO - 'https://sinusbot-installer.de/ts3version')
 
