@@ -604,7 +604,7 @@ if [ "$DISCORD" == "false" ]; then
 
 greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-VERSION="3.2.5"
+VERSION="3.3.0"
 
 #VERSION=$(wget -qO - 'https://sinusbot-installer.de/ts3version')
 
@@ -634,7 +634,7 @@ else
   else
     apt-get -y install ntp
   fi
-  apt-get -y -qq install libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6
+  apt-get -y -qq install libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0
   update-ca-certificates >/dev/null
 fi
 
