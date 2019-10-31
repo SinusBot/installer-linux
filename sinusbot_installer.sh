@@ -96,6 +96,11 @@ if [[ $(command -v systemctl) == "" ]]; then
   USE_SYSTEMD=false
 fi
 
+# If kernel to old, quit
+if [ $(uname -r | cut -c1-1) < 3 ]; then
+  errorExit "Linux kernel unsupportet. Update kernel before. Or change hardware."
+fi
+
 # If the linux distribution is not debian and centos, then exit
 if [ ! -f /etc/debian_version ] && [ ! -f /etc/centos-release ]; then
   errorExit "Not supported linux distribution. Only Debian and CentOS are currently supported"!
