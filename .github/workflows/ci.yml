@@ -1,8 +1,8 @@
-name: Go
+name: CI
 on: [push]
 jobs:
-  build:
-    name: Build
+  test:
+    name: Test SinusBot Installer
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go
