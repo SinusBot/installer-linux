@@ -574,13 +574,12 @@ fi
 
 # Update packages or not
 
-redMessage 'Update the system packages to the latest version? Recommended, as otherwise dependencies might break! Option "No" will exit the installer'
+redMessage 'Update the system packages to the latest version? (Recommended)'
 
 OPTIONS=("Yes" "No")
 select OPTION in "${OPTIONS[@]}"; do
   case "$REPLY" in
-  1) break ;;
-  2) errorQuit ;;
+  1 | 2) break ;;
   *) errorContinue ;;
   esac
 done
