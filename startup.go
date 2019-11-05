@@ -55,7 +55,7 @@ func main() {
 				Detect: "Check your time below:",
 			},
 			parameter{
-				Value:  "1",
+				Value:  "2",
 				Detect: "Update the system packages to the latest version?",
 			},
 			parameter{
