@@ -1,11 +1,11 @@
-# SinusBot installer for Linux
+# SinusBot Installer for Linux
 
-[![Build Status](https://travis-ci.org/SinusBot/installer-linux.svg?branch=master)](https://travis-ci.org/SinusBot/installer-linux)
+![Build Status](https://github.com/sinusbot/installer-linux/workflows/CI/badge.svg)
 
-## Officially supported linux distributions
+## Officially supported Linux distributions
 
 - Debian 8+
-- Ubuntu 14.0.4+
+- Ubuntu 14.04+
 - CentOS 7+
 
 ## Features

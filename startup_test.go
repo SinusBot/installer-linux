@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-const teamspeakCheckNickname = "SinusBot via Travis CI"
+const teamspeakCheckNickname = "SinusBot via GitHub Actions"
 
 type instance struct {
 	UUID string `json:"uuid"`

@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"log"
@@ -12,6 +11,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type parameter struct {
@@ -99,6 +100,8 @@ func (a *app) checkParameters(line string) error {
 
 func (a *app) Run() error {
 	cmd := exec.Command("bash", a.FileName)
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, "DEBIAN_FRONTEND=noninteractive")
 
 	var err error
 	a.cmdStdout, err = cmd.StdoutPipe()
