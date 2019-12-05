@@ -77,7 +77,7 @@ fi
 # Update notify
 
 cyanMessage "Checking for the latest installer version"
-if [ -f /etc/centos-release ]; then
+if [[ -f /etc/centos-release ]]; then
   yum -y -q install wget
 else
   apt-get -qq install wget -y
@@ -200,11 +200,11 @@ if [[ $INSTALL == "Res" ]]; then
   greenMessage "Please login to your SinusBot webinterface as admin and '$PW'"
   yellowMessage "After that change your password under Settings->User Accounts->admin->Edit. The script restart the bot with init.d or systemd."
 
-  if [ -f /lib/systemd/system/sinusbot.service ]; then
+  if [[ -f /lib/systemd/system/sinusbot.service ]]; then
     if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
       service sinusbot stop
     fi
-  elif [ -f /etc/init.d/sinusbot ]; then
+  elif [[ -f /etc/init.d/sinusbot ]]; then
     if [ "$(/etc/init.d/sinusbot status | awk '{print $NF; exit}')" == "UP" ]; then
       /etc/init.d/sinusbot stop
     fi
@@ -225,10 +225,10 @@ if [[ $INSTALL == "Res" ]]; then
 
       greenMessage "Successfully changed your admin password."
 
-      if [ -f /lib/systemd/system/sinusbot.service ]; then
+      if [[ -f /lib/systemd/system/sinusbot.service ]]; then
         service sinusbot start
         greenMessage "Started your bot with systemd."
-      elif [ -f /etc/init.d/sinusbot ]; then
+      elif [[ -f /etc/init.d/sinusbot ]]; then
         /etc/init.d/sinusbot start
         greenMessage "Started your bot with initd."
       else
@@ -244,7 +244,7 @@ fi
 
 if [ "$INSTALL" != "Rem" ]; then
 
-  if [ -f /etc/centos-release ]; then
+  if [[ -f /etc/centos-release ]]; then
     greenMessage "Installing redhat-lsb! Please wait."
     yum -y -q install redhat-lsb
     greenMessage "Done"!
@@ -266,7 +266,7 @@ if [ "$INSTALL" != "Rem" ]; then
     fi
   fi
 
-  if [ -f /etc/debian_version ]; then
+  if [[ -f /etc/debian_version ]]; then
     greenMessage "Check if lsb-release and debconf-utils is installed..."
     apt-get -qq update
     apt-get -qq install debconf-utils -y
@@ -282,7 +282,7 @@ if [ "$INSTALL" != "Rem" ]; then
   VIRTUALIZATION_TYPE=""
 
   # Extracted from the virt-what sourcecode: http://git.annexia.org/?p=virt-what.git;a=blob_plain;f=virt-what.in;hb=HEAD
-  if [ -f "/.dockerinit" ]; then
+  if [[ -f "/.dockerinit" ]]; then
     VIRTUALIZATION_TYPE="docker"
   fi
   if [ -d "/proc/vz" -a ! -d "/proc/bc" ]; then
@@ -438,7 +438,7 @@ if [ "$INSTALL" == "Rem" ]; then
 
   SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
 
-  if [ -f /usr/local/bin/youtube-dl ]; then
+  if [[ -f /usr/local/bin/youtube-dl ]]; then
     redMessage "Remove YoutubeDL?"
 
     OPTIONS=("Yes" "No")
@@ -450,11 +450,11 @@ if [ "$INSTALL" == "Rem" ]; then
     done
 
     if [ "$OPTION" == "Yes" ]; then
-      if [ -f /usr/local/bin/youtube-dl ]; then
+      if [[ -f /usr/local/bin/youtube-dl ]]; then
         rm /usr/local/bin/youtube-dl
       fi
 
-      if [ -f /etc/cron.d/ytdl ]; then
+      if [[ -f /etc/cron.d/ytdl ]]; then
         rm /etc/cron.d/ytdl
       fi
 
@@ -491,13 +491,13 @@ if [ "$INSTALL" == "Rem" ]; then
     done
   fi
 
-  if [ -f /lib/systemd/system/sinusbot.service ]; then
+  if [[ -f /lib/systemd/system/sinusbot.service ]]; then
     if [[ $(systemctl is-active sinusbot >/dev/null && echo UP || echo DOWN) == "UP" ]]; then
       service sinusbot stop
       systemctl disable sinusbot
     fi
     rm /lib/systemd/system/sinusbot.service
-  elif [ -f /etc/init.d/sinusbot ]; then
+  elif [[ -f /etc/init.d/sinusbot ]]; then
     if [ "$(/etc/init.d/sinusbot status | awk '{print $NF; exit}')" == "UP" ]; then
       su -c "/etc/init.d/sinusbot stop" $SINUSBOTUSER
       su -c "screen -wipe" $SINUSBOTUSER
@@ -506,7 +506,7 @@ if [ "$INSTALL" == "Rem" ]; then
     rm /etc/init.d/sinusbot
   fi
 
-  if [ -f /etc/cron.d/sinusbot ]; then
+  if [[ -f /etc/cron.d/sinusbot ]]; then
     rm /etc/cron.d/sinusbot
   fi
 
@@ -593,7 +593,7 @@ if [ "$OPTION" == "Yes" ]; then
   redMessage "This could take a while. Please wait up to 10 minutes"!
   sleep 3
 
-  if [ -f /etc/centos-release ]; then
+  if [[ -f /etc/centos-release ]]; then
     yum -y -q update
     yum -y -q upgrade
   else
@@ -628,7 +628,7 @@ fi
 
 magentaMessage "Installing necessary packages. Please wait..."
 
-if [ -f /etc/centos-release ]; then
+if [[ -f /etc/centos-release ]]; then
   yum -y -q install screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1 >/dev/null
   update-ca-trust extract >/dev/null
 else
@@ -646,7 +646,7 @@ else
 
 magentaMessage "Installing necessary packages. Please wait..."
 
-if [ -f /etc/centos-release ]; then
+if [[ -f /etc/centos-release ]]; then
   yum -y -q install ca-certificates bzip2 python wget >/dev/null
   update-ca-trust extract >/dev/null
 else
@@ -663,7 +663,7 @@ greenMessage "Packages installed"!
 if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
   redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
 else
-  if [ -f /etc/centos-release ] || [ $(cat /etc/*release | grep "DISTRIB_ID=" | sed 's/DISTRIB_ID=//g') ]; then
+  if [[ -f /etc/centos-release ]] || [ $(cat /etc/*release | grep "DISTRIB_ID=" | sed 's/DISTRIB_ID=//g') ]; then
     if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
       systemctl start chronyd
       if [[ $(chronyc -a 'burst 4/4') == "200 OK" ]]; then
@@ -672,13 +672,13 @@ else
         errorExit "Error while setting time via chrony"!
       fi
     else
-      if [ -f /etc/centos-release ]; then
+      if [[ -f /etc/centos-release ]]; then
        service ntpd stop
       else
        service ntp stop
       fi
       ntpd -s 0.pool.ntp.org
-      if [ -f /etc/centos-release ]; then
+      if [[ -f /etc/centos-release ]]; then
        service ntpd start
       else
        service ntp start
@@ -765,7 +765,7 @@ cd $LOCATION/teamspeak3-client
 
 # Downloading TS3-Client files.
 
-if [ -f CHANGELOG ] && [ $(cat CHANGELOG | awk '/Client Release/{ print $4; exit }') == $VERSION ]; then
+if [[ -f CHANGELOG ]] && [ $(cat CHANGELOG | awk '/Client Release/{ print $4; exit }') == $VERSION ]; then
   greenMessage "TS3 already latest version."
 else
 
@@ -779,7 +779,7 @@ fi
 
 # Installing TS3-Client.
 
-if [ -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run ]; then
+if [[ -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run ]]; then
   greenMessage "Installing the TS3 client."
   redMessage "Read the eula"!
   sleep 1
@@ -826,7 +826,7 @@ fi
 # Copy the SinusBot plugin into the teamspeak clients plugin directory
 cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
 
-if [ -f teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so ]; then
+if [[ -f teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so ]]; then
   rm teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so
 fi
 fi
@@ -843,7 +843,7 @@ if [[ "$USE_SYSTEMD" == true ]]; then
 
   greenMessage "Starting systemd installation"
 
-  if [ -f /etc/systemd/system/sinusbot.service ]; then
+  if [[ -f /etc/systemd/system/sinusbot.service ]]; then
     service sinusbot stop
     systemctl disable sinusbot
     rm /etc/systemd/system/sinusbot.service
@@ -883,7 +883,7 @@ elif [[ "$USE_SYSTEMD" == false ]]; then
 
   chmod +x /etc/init.d/sinusbot
 
-  if [ -f /etc/centos-release ]; then
+  if [[ -f /etc/centos-release ]]; then
     chkconfig sinusbot on >/dev/null
   else
     update-rc.d sinusbot defaults >/dev/null
@@ -934,7 +934,7 @@ if [ "$YT" == "Yes" ]; then
         rm /etc/cron.d/ytdl
         yellowMessage "Deleted old YT-DL cronjob. Generating new one in a second."
   fi
-  if [ -f /etc/cron.d/ytdl ] && [ "$(grep -c 'youtube' /etc/cron.d/ytdl)" -ge 1 ]; then
+  if [[ -f /etc/cron.d/ytdl ]] && [ "$(grep -c 'youtube' /etc/cron.d/ytdl)" -ge 1 ]; then
     redMessage "Cronjob already set for YT-DL updater"!
   else
     greenMessage "Installing Cronjob for automatic YT-DL update..."
@@ -944,7 +944,7 @@ if [ "$YT" == "Yes" ]; then
 
   sed -i 's/YoutubeDLPath = \"\"/YoutubeDLPath = \"\/usr\/local\/bin\/youtube-dl\"/g' $LOCATION/config.ini
 
-  if [ -f /usr/local/bin/youtube-dl ]; then
+  if [[ -f /usr/local/bin/youtube-dl ]]; then
     rm /usr/local/bin/youtube-dl
   fi
 
@@ -995,7 +995,7 @@ greenMessage "Generated README_installer.txt"!
 
 # Delete files if exists
 
-if [ -f /tmp/.sinusbot.lock ]; then
+if [[ -f /tmp/.sinusbot.lock ]]; then
   rm /tmp/.sinusbot.lock
   greenMessage "Deleted /tmp/.sinusbot.lock"
 fi
@@ -1040,7 +1040,7 @@ elif [[ "$USE_SYSTEMD" == false ]]; then
   sleep 10
 fi
 
-if [ -f /etc/centos-release ]; then
+if [[ -f /etc/centos-release ]]; then
   if [ "$FIREWALL" == "ip" ]; then
     iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 8087 -j ACCEPT
   elif [ "$FIREWALL" == "fs" ]; then
@@ -1076,11 +1076,11 @@ if [[ "$IS_RUNNING" == true ]]; then
   fi
 
   if [[ $INSTALL == "Updt" ]]; then
-    if [ -f /lib/systemd/system/sinusbot.service ]; then
+    if [[ -f /lib/systemd/system/sinusbot.service ]]; then
       service sinusbot restart
       greenMessage "Restarted your bot with systemd."
     fi
-    if [ -f /etc/init.d/sinusbot ]; then
+    if [[ -f /etc/init.d/sinusbot ]]; then
       /etc/init.d/sinusbot restart
       greenMessage "Restarted your bot with initd."
     fi
