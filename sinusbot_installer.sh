@@ -82,14 +82,6 @@ if [[ -f /etc/centos-release ]]; then
 else
   apt-get -qq install wget -y
 fi
-LATEST_VERSION=$(wget --no-check-certificate --timeout=60 -qO - https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh | grep -Po '(?<=Instversion=")([0-9]\.[0-9]+)')
-
-if [ "$(printf "${LATEST_VERSION}\\n${Instversion}" | sort -V | tail -n 1)" != "$Instversion" ]; then
-  errorExit "Outdated installer ${Instversion}. Upgrade your installer to version ${LATEST_VERSION} or reuse https://sinusbot-installer.de"
-else
-  greenMessage "Your installer is up-to-date."
-  sleep 1
-fi
 
 # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
 if [[ $(command -v systemctl) == "" ]]; then
@@ -608,9 +600,7 @@ if [ "$DISCORD" == "false" ]; then
 
 greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-#VERSION="3.3.0"
-
-VERSION=$(wget --no-check-certificate -qO - 'https://sinusbot-installer.de/ts3version')
+VERSION="3.3.2"
 
 DOWNLOAD_URL_VERSION="https://files.teamspeak-services.com/releases/client/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
