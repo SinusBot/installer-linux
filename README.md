@@ -4,8 +4,8 @@
 
 ## Officially supported Linux distributions
 
-- Debian 8+
-- Ubuntu 14.04+
+- Debian 9+
+- Ubuntu 16.10+
 - CentOS 7+
 
 ## Features
