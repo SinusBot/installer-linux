@@ -796,16 +796,16 @@ cd $LOCATION
 
 greenMessage "Downloading latest SinusBot."
 
-su -c "wget -q https://www.sinusbot.com/dl/sinusbot.current.tar.bz2" $SINUSBOTUSER
-if [[ ! -f sinusbot.current.tar.bz2 && ! -f sinusbot ]]; then
+su -c "wget -q https://www.sinusbot.com/pre/sinusbot-1.0.1-amd64.tar.bz2" $SINUSBOTUSER
+if [[ ! -f sinusbot-1.0.1-amd64.tar.bz2 && ! -f sinusbot ]]; then
   errorExit "Download failed! Exiting now"!
 fi
 
 # Installing latest SinusBot.
 
 greenMessage "Extracting SinusBot files."
-su -c "tar -xjf sinusbot.current.tar.bz2" $SINUSBOTUSER
-rm -f sinusbot.current.tar.bz2
+su -c "tar -xjf sinusbot-1.0.1-amd64.tar.bz2" $SINUSBOTUSER
+rm -f sinusbot-1.0.1-amd64.tar.bz2
 
 if [ "$DISCORD" == "false" ]; then
 
