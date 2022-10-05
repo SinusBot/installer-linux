@@ -44,16 +44,8 @@ func main() {
 				Detect: "Should I install TeamSpeak or only Discord Mode?",
 			},
 			parameter{
-				Value:  "2",
-				Detect: "This SinusBot version is only for private use! Accept?",
-			},
-			parameter{
 				Value:  "1",
 				Detect: "Should YT-DL be installed/updated?",
-			},
-			parameter{
-				Value:  "1",
-				Detect: "Check your time below:",
 			},
 			parameter{
 				Value:  "2",
