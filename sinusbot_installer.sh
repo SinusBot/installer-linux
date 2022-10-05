@@ -611,7 +611,7 @@ if [ "$DISCORD" == "false" ]; then
     yum -y -q install screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less ntp python3 iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1 >/dev/null
     update-ca-trust extract >/dev/null
   else
-    apt-get install -y -qq --no-install-recommends libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less python3 python-is-python3 iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
+    apt-get install -y -qq --no-install-recommends libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less python3 iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
     update-ca-certificates >/dev/null
   fi
   if [[ $(cat /etc/*release | grep "PRETTY_NAME=" | sed 's/PRETTY_NAME=//g') =~ "Debian" ]]; then
