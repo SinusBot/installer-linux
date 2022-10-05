@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/multiplay/go-ts3"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/multiplay/go-ts3"
+	"github.com/pkg/errors"
 )
 
 const teamspeakCheckNickname = "SinusBot via GitHub Actions"
