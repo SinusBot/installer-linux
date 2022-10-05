@@ -608,28 +608,24 @@ fi
 magentaMessage "Installing necessary packages. Please wait..."
 
 if [[ -f /etc/centos-release ]]; then
-  yum -y -q install screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less ntp python iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1 >/dev/null
+  yum -y -q install screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less ntp python3 iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1 >/dev/null
   update-ca-trust extract >/dev/null
 else
-  # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
-  if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
-    apt-get -y install chrony
-  else
-    apt-get -y install ntp
-  fi
-  apt-get install -y -qq --no-install-recommends libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
+  apt-get install -y -qq --no-install-recommends libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less python3 iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
   update-ca-certificates >/dev/null
 fi
-
+if [[ $(cat /etc/*release | grep "PRETTY_NAME=" | sed 's/PRETTY_NAME=//g') =~ "Debian" ]]; then
+    apt-get install -y -qq --no-install-recommends python-is-python3
+fi
 else
 
 magentaMessage "Installing necessary packages. Please wait..."
 
 if [[ -f /etc/centos-release ]]; then
-  yum -y -q install ca-certificates bzip2 python wget >/dev/null
+  yum -y -q install ca-certificates bzip2 python3 wget >/dev/null
   update-ca-trust extract >/dev/null
 else
-  apt-get -qq install ca-certificates bzip2 python wget -y >/dev/null
+  apt-get -qq install ca-certificates bzip2 python3 wget -y >/dev/null
   update-ca-certificates >/dev/null
 fi
 
