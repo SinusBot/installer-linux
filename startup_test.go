@@ -215,7 +215,7 @@ func changeSettings(uuid, token string) error {
 }
 
 func despawnInstance(uuid, token string) error {
-	req, err := http.NewRequest("POST", "http://127.0.0.1:8087/api/v1/bot/i/"+uuid+"/spawn", nil)
+	req, err := http.NewRequest("POST", "http://127.0.0.1:8087/api/v1/bot/i/"+uuid+"/kill", nil)
 	if err != nil {
 		return errors.Wrap(err, "could not create request")
 	}
