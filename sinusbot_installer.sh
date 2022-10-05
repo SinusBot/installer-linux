@@ -633,47 +633,6 @@ fi
 
 greenMessage "Packages installed"!
 
-# Setting server time
-
-if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
-  redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
-else
-  if [[ -f /etc/centos-release ]] || [ $(cat /etc/*release | grep "DISTRIB_ID=" | sed 's/DISTRIB_ID=//g') ]; then
-    if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
-      systemctl start chronyd
-      if [[ $(chronyc -a 'burst 4/4') == "200 OK" ]]; then
-        TIME=$(date)
-      else
-        errorExit "Error while setting time via chrony"!
-      fi
-    else
-      if [[ -f /etc/centos-release ]]; then
-       service ntpd stop
-      else
-       service ntp stop
-      fi
-      ntpd -s 0.pool.ntp.org
-      if [[ -f /etc/centos-release ]]; then
-       service ntpd start
-      else
-       service ntp start
-      fi
-      TIME=$(date)
-    fi
-    greenMessage "Automatically set time to" $TIME!
-  else
-    if [[ $(command -v timedatectl) != "" ]]; then
-      service ntp restart
-      timedatectl set-ntp yes
-      timedatectl
-      TIME=$(date)
-      greenMessage "Automatically set time to" $TIME!
-    else
-      redMessage "Unable to configure your date automatically, the installation will still be attempted."
-    fi
-  fi
-fi
-
 USERADD=$(which useradd)
 GROUPADD=$(which groupadd)
 ipaddress=$(ip route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
