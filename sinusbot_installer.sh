@@ -4,7 +4,7 @@
 # Vars
 
 MACHINE=$(uname -m)
-Instversion="1.5"
+Instversion="2.0"
 
 USE_SYSTEMD=true
 
@@ -52,12 +52,12 @@ function makeDir() {
 
 err_report() {
   FAILED_COMMAND=$(wget -q -O - https://raw.githubusercontent.com/Sinusbot/installer-linux/master/sinusbot_installer.sh | sed -e "$1q;d")
-  FAILED_COMMAND=${FAILED_COMMAND/ -qq}
-  FAILED_COMMAND=${FAILED_COMMAND/ -q}
-  FAILED_COMMAND=${FAILED_COMMAND/ -s}
-  FAILED_COMMAND=${FAILED_COMMAND/ 2\>\/dev\/null\/}
-  FAILED_COMMAND=${FAILED_COMMAND/ 2\>&1}
-  FAILED_COMMAND=${FAILED_COMMAND/ \>\/dev\/null}
+  FAILED_COMMAND=${FAILED_COMMAND/ -qq/}
+  FAILED_COMMAND=${FAILED_COMMAND/ -q/}
+  FAILED_COMMAND=${FAILED_COMMAND/ -s/}
+  FAILED_COMMAND=${FAILED_COMMAND/ 2\>\/dev\/null\//}
+  FAILED_COMMAND=${FAILED_COMMAND/ 2\>&1/}
+  FAILED_COMMAND=${FAILED_COMMAND/ \>\/dev\/null/}
   if [[ "$FAILED_COMMAND" == "" ]]; then
     redMessage "Failed command: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L""$1"
   else
@@ -91,7 +91,7 @@ if [[ $(command -v systemctl) == "" ]]; then
 fi
 
 # If kernel to old, quit
-if [ $(uname -r | cut -c1-1) < 3 ]; then
+if [ $(uname -r | cut -c1-1) ] <3; then
   errorExit "Linux kernel unsupportet. Update kernel before. Or change hardware."
 fi
 
@@ -385,22 +385,22 @@ LOCATIONex=$LOCATION/sinusbot
 
 if [[ $INSTALL == "Inst" ]] || [[ $INSTALL == "Updt" ]]; then
 
-yellowMessage "Should I install TeamSpeak or only Discord Mode?"
+  yellowMessage "Should I install TeamSpeak or only Discord Mode?"
 
-OPTIONS=("Both" "Only Discord" "Quit")
-select OPTION in "${OPTIONS[@]}"; do
-  case "$REPLY" in
-  1 | 2) break ;;
-  3) errorQuit ;;
-  *) errorContinue ;;
-  esac
-done
+  OPTIONS=("Both" "Only Discord" "Quit")
+  select OPTION in "${OPTIONS[@]}"; do
+    case "$REPLY" in
+    1 | 2) break ;;
+    3) errorQuit ;;
+    *) errorContinue ;;
+    esac
+  done
 
-if [ "$OPTION" == "Both" ]; then
-  DISCORD="false"
-else
-  DISCORD="true"
-fi
+  if [ "$OPTION" == "Both" ]; then
+    DISCORD="false"
+  else
+    DISCORD="true"
+  fi
 fi
 
 if [[ $INSTALL == "Inst" ]]; then
@@ -600,51 +600,51 @@ fi
 
 if [ "$DISCORD" == "false" ]; then
 
-greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
+  greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-VERSION="3.5.6"
+  VERSION="3.5.6"
 
-DOWNLOAD_URL_VERSION="https://files.teamspeak-services.com/releases/client/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
- STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
+  DOWNLOAD_URL_VERSION="https://files.teamspeak-services.com/releases/client/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
+  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
   if [ "$STATUS" == "200" ]; then
     DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
   fi
 
-if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
-  greenMessage "Detected latest TS3-Client version as $VERSION"
-else
-  errorExit "Could not detect latest TS3-Client version"
-fi
-
-# Install necessary aptitudes for sinusbot.
-
-magentaMessage "Installing necessary packages. Please wait..."
-
-if [[ -f /etc/centos-release ]]; then
-  yum -y -q install screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less ntp python iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1 >/dev/null
-  update-ca-trust extract >/dev/null
-else
-  # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
-  if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
-    apt-get -y install chrony
+  if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
+    greenMessage "Detected latest TS3-Client version as $VERSION"
   else
-    apt-get -y install ntp
+    errorExit "Could not detect latest TS3-Client version"
   fi
-  apt-get install -y -qq --no-install-recommends libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
-  update-ca-certificates >/dev/null
-fi
+
+  # Install necessary aptitudes for sinusbot.
+
+  magentaMessage "Installing necessary packages. Please wait..."
+
+  if [[ -f /etc/centos-release ]]; then
+    yum -y -q install screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less ntp python3 iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1 >/dev/null
+    update-ca-trust extract >/dev/null
+  else
+    # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
+    if [ "$OS" == "ubuntu" ]; then
+      apt-get -y install chrony
+    else
+      apt-get -y install ntp
+    fi
+    apt-get install -y -qq --no-install-recommends libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less python3 iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
+    update-ca-certificates >/dev/null
+  fi
 
 else
 
-magentaMessage "Installing necessary packages. Please wait..."
+  magentaMessage "Installing necessary packages. Please wait..."
 
-if [[ -f /etc/centos-release ]]; then
-  yum -y -q install ca-certificates bzip2 python wget >/dev/null
-  update-ca-trust extract >/dev/null
-else
-  apt-get -qq install ca-certificates bzip2 python wget -y >/dev/null
-  update-ca-certificates >/dev/null
-fi
+  if [[ -f /etc/centos-release ]]; then
+    yum -y -q install ca-certificates bzip2 python3 wget >/dev/null
+    update-ca-trust extract >/dev/null
+  else
+    apt-get -qq install ca-certificates bzip2 python3 wget -y >/dev/null
+    update-ca-certificates >/dev/null
+  fi
 
 fi
 
@@ -652,44 +652,44 @@ greenMessage "Packages installed"!
 
 # Setting server time
 
-if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
-  redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
-else
-  if [[ -f /etc/centos-release ]] || [ $(cat /etc/*release | grep "DISTRIB_ID=" | sed 's/DISTRIB_ID=//g') ]; then
-    if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
-      systemctl start chronyd
-      if [[ $(chronyc -a 'burst 4/4') == "200 OK" ]]; then
-        TIME=$(date)
-      else
-        errorExit "Error while setting time via chrony"!
-      fi
-    else
-      if [[ -f /etc/centos-release ]]; then
-       service ntpd stop
-      else
-       service ntp stop
-      fi
-      ntpd -s 0.pool.ntp.org
-      if [[ -f /etc/centos-release ]]; then
-       service ntpd start
-      else
-       service ntp start
-      fi
-      TIME=$(date)
-    fi
-    greenMessage "Automatically set time to" $TIME!
-  else
-    if [[ $(command -v timedatectl) != "" ]]; then
-      service ntp restart
-      timedatectl set-ntp yes
-      timedatectl
-      TIME=$(date)
-      greenMessage "Automatically set time to" $TIME!
-    else
-      redMessage "Unable to configure your date automatically, the installation will still be attempted."
-    fi
-  fi
-fi
+#if [[ $VIRTUALIZATION_TYPE == "openvz" ]]; then
+#  redMessage "You're using OpenVZ virtualization. You can't set your time, maybe it works but there is no guarantee. Skipping this part..."
+#else
+#   if [[ -f /etc/centos-release ]] || [ $(cat /etc/*release | grep "DISTRIB_ID=" | sed 's/DISTRIB_ID=//g') ]; then
+#     if [ "$OS" == "ubuntu" ]; then
+#       systemctl start chronyd
+#       if [[ $(chronyc -a 'burst 4/4') == "200 OK" ]]; then
+#         TIME=$(date)
+#       else
+#         errorExit "Error while setting time via chrony"!
+#       fi
+#     else
+#       if [[ -f /etc/centos-release ]]; then
+#        service ntpd stop
+#       else
+#        service ntp stop
+#       fi
+#       ntpd -s 0.pool.ntp.org
+#       if [[ -f /etc/centos-release ]]; then
+#        service ntpd start
+#       else
+#        service ntp start
+#       fi
+#       TIME=$(date)
+#     fi
+#     greenMessage "Automatically set time to" $TIME!
+#   else
+#     if [[ $(command -v timedatectl) != "" ]]; then
+#       service ntp restart
+#       timedatectl set-ntp yes
+#       timedatectl
+#       TIME=$(date)
+#       greenMessage "Automatically set time to" $TIME!
+#     else
+#       redMessage "Unable to configure your date automatically, the installation will still be attempted."
+#     fi
+#   fi
+# fi
 
 USERADD=$(which useradd)
 GROUPADD=$(which groupadd)
@@ -733,8 +733,8 @@ else
     greenMessage "User \"$SINUSBOTUSER\" already exists."
   fi
 
-chmod 750 -R $LOCATION
-chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
+  chmod 750 -R $LOCATION
+  chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
 
 fi
 
@@ -749,47 +749,47 @@ fi
 
 if [ "$DISCORD" == "false" ]; then
 
-makeDir $LOCATION/teamspeak3-client
+  makeDir $LOCATION/teamspeak3-client
 
-chmod 750 -R $LOCATION
-chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
-cd $LOCATION/teamspeak3-client
+  chmod 750 -R $LOCATION
+  chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
+  cd $LOCATION/teamspeak3-client
 
-# Downloading TS3-Client files.
+  # Downloading TS3-Client files.
 
-if [[ -f CHANGELOG ]] && [ $(cat CHANGELOG | awk '/Client Release/{ print $4; exit }') == $VERSION ]; then
-  greenMessage "TS3 already latest version."
-else
+  if [[ -f CHANGELOG ]] && [ $(cat CHANGELOG | awk '/Client Release/{ print $4; exit }') == $VERSION ]; then
+    greenMessage "TS3 already latest version."
+  else
 
-  greenMessage "Downloading TS3 client files."
-  su -c "wget -q $DOWNLOAD_URL" $SINUSBOTUSER
+    greenMessage "Downloading TS3 client files."
+    su -c "wget -q $DOWNLOAD_URL" $SINUSBOTUSER
 
-  if [[ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run && ! -f ts3client_linux_$ARCH ]]; then
-    errorExit "Download failed! Exiting now"!
+    if [[ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run && ! -f ts3client_linux_$ARCH ]]; then
+      errorExit "Download failed! Exiting now"!
+    fi
   fi
-fi
 
-# Installing TS3-Client.
+  # Installing TS3-Client.
 
-if [[ -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run ]]; then
-  greenMessage "Installing the TS3 client."
-  redMessage "Read the eula"!
-  sleep 1
-  yellowMessage 'Do the following: Press "ENTER" then press "q" after that press "y" and accept it with another "ENTER".'
-  sleep 2
+  if [[ -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run ]]; then
+    greenMessage "Installing the TS3 client."
+    redMessage "Read the eula"!
+    sleep 1
+    yellowMessage 'Do the following: Press "ENTER" then press "q" after that press "y" and accept it with another "ENTER".'
+    sleep 2
 
-  chmod 777 ./TeamSpeak3-Client-linux_$ARCH-$VERSION.run
+    chmod 777 ./TeamSpeak3-Client-linux_$ARCH-$VERSION.run
 
-  su -c "./TeamSpeak3-Client-linux_$ARCH-$VERSION.run" $SINUSBOTUSER
+    su -c "./TeamSpeak3-Client-linux_$ARCH-$VERSION.run" $SINUSBOTUSER
 
-  cp -R ./TeamSpeak3-Client-linux_$ARCH/* ./
-  sleep 2
-  rm ./ts3client_runscript.sh
-  rm ./TeamSpeak3-Client-linux_$ARCH-$VERSION.run
-  rm -R ./TeamSpeak3-Client-linux_$ARCH
+    cp -R ./TeamSpeak3-Client-linux_$ARCH/* ./
+    sleep 2
+    rm ./ts3client_runscript.sh
+    rm ./TeamSpeak3-Client-linux_$ARCH-$VERSION.run
+    rm -R ./TeamSpeak3-Client-linux_$ARCH
 
-  greenMessage "TS3 client install done."
-fi
+    greenMessage "TS3 client install done."
+  fi
 fi
 
 # Downloading latest SinusBot.
@@ -811,16 +811,16 @@ rm -f sinusbot.current.tar.bz2
 
 if [ "$DISCORD" == "false" ]; then
 
-if [ ! -d teamspeak3-client/plugins/ ]; then
-  mkdir teamspeak3-client/plugins/
-fi
+  if [ ! -d teamspeak3-client/plugins/ ]; then
+    mkdir teamspeak3-client/plugins/
+  fi
 
-# Copy the SinusBot plugin into the teamspeak clients plugin directory
-cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
+  # Copy the SinusBot plugin into the teamspeak clients plugin directory
+  cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
 
-if [[ -f teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so ]]; then
-  rm teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so
-fi
+  if [[ -f teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so ]]; then
+    rm teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so
+  fi
 fi
 
 chmod 755 sinusbot
@@ -923,8 +923,8 @@ fi
 if [ "$YT" == "Yes" ]; then
   greenMessage "Installing YT-Downloader now"!
   if [ "$(cat /etc/cron.d/ytdl)" == "0 0 * * * $SINUSBOTUSER youtube-dl -U --restrict-filename >/dev/null" ]; then
-        rm /etc/cron.d/ytdl
-        yellowMessage "Deleted old YT-DL cronjob. Generating new one in a second."
+    rm /etc/cron.d/ytdl
+    yellowMessage "Deleted old YT-DL cronjob. Generating new one in a second."
   fi
   if [[ -f /etc/cron.d/ytdl ]] && [ "$(grep -c 'youtube' /etc/cron.d/ytdl)" -ge 1 ]; then
     redMessage "Cronjob already set for YT-DL updater"!
@@ -1052,7 +1052,7 @@ if [[ "$USE_SYSTEMD" == true ]]; then
   fi
 elif [[ "$USE_SYSTEMD" == false ]]; then
   if [[ $(/etc/init.d/sinusbot status | awk '{print $NF; exit}') == "UP" ]]; then
-     IS_RUNNING=true
+    IS_RUNNING=true
   fi
 fi
 
