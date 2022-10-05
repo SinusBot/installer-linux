@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -35,9 +36,9 @@ func TestDiscord(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not read password file")
 	}
-	apitoken, err := ioutil.ReadFile(".discord")
-	if err != nil {
-		t.Fatalf("could not read discord token file")
+	apitoken := getDiscordToken()
+	if apitoken == "" {
+		t.Fatalf("could not read discord token env")
 	}
 	token, err := login("admin", string(pw), *botId)
 	if err != nil {
@@ -118,6 +119,10 @@ func getInstances(token string) ([]instance, error) {
 		return nil, errors.Wrap(err, "could not decode json")
 	}
 	return data, nil
+}
+
+func getDiscordToken() string {
+	return os.Getenv("DISCORD_KEY")
 }
 
 type DiscordInstance struct {
