@@ -4,16 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/multiplay/go-ts3"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/multiplay/go-ts3"
+	"github.com/pkg/errors"
 )
 
-const teamspeakCheckNickname = "SinusBot via GitHub Actions"
+const checkNickname = "SinusBot via GitHub Actions"
 
 type instance struct {
 	UUID string `json:"uuid"`
@@ -22,6 +24,34 @@ type instance struct {
 func TestIsBotRunning(t *testing.T) {
 	if _, err := getBotID(); err != nil {
 		t.Fatalf("could not get botId: %v", err)
+	}
+}
+
+func TestDiscord(t *testing.T) {
+	botId, err := getBotID()
+	if err != nil {
+		t.Fatalf("could not get botId: %v", err)
+	}
+	pw, err := ioutil.ReadFile(".password")
+	if err != nil {
+		t.Fatalf("could not read password file")
+	}
+	apitoken := getDiscordToken()
+	if apitoken == "" {
+		t.Fatalf("could not read discord token env")
+	}
+	token, err := login("admin", string(pw), *botId)
+	if err != nil {
+		t.Fatalf("could not get token: %v", err)
+	}
+	instance, err := createDiscordInstance(string(apitoken), *token)
+	if err != nil {
+		t.Fatalf("could not create instance: %v", err)
+	}
+	fmt.Println("Created instance ", instance.UUID)
+
+	if err := spawnInstance(instance.UUID, *token); err != nil {
+		t.Fatalf("could not spawn discord instance: %v", err)
 	}
 }
 
@@ -64,13 +94,35 @@ func TestIsBotOnTeamspeak(t *testing.T) {
 	}
 	found := false
 	for _, client := range clientList {
-		if strings.Contains(client.Nickname, teamspeakCheckNickname) {
+		if strings.Contains(client.Nickname, checkNickname) {
 			found = true
 			break
 		}
 	}
 	if !found {
 		t.Fatal("no client found")
+	}
+	botId, err := getBotID()
+	if err != nil {
+		t.Fatalf("could not get botId: %v", err)
+	}
+	pw, err := ioutil.ReadFile(".password")
+	if err != nil {
+		t.Fatalf("could not read password file")
+	}
+	token, err := login("admin", string(pw), *botId)
+	if err != nil {
+		t.Fatalf("could not get token: %v", err)
+	}
+	bots, err := getInstances(*token)
+	if err != nil {
+		t.Fatalf("could not get instances: %v", err)
+	}
+	if err := despawnInstance(bots[0].UUID, *token); err != nil {
+		t.Fatalf("could not change instance settings: %v", err)
+	}
+	if err := despawnInstance(bots[1].UUID, *token); err != nil {
+		t.Fatalf("could not change instance settings: %v", err)
 	}
 }
 
@@ -91,10 +143,47 @@ func getInstances(token string) ([]instance, error) {
 	return data, nil
 }
 
+func getDiscordToken() string {
+	return os.Getenv("DISCORD_KEY")
+}
+
+type DiscordInstance struct {
+	Success bool   `json:"success"`
+	UUID    string `json:"uuid"`
+}
+
+func createDiscordInstance(apitoken, token string) (*DiscordInstance, error) {
+	postData, err := json.Marshal(map[string]string{
+		"backend": "discord",
+		"nick":    checkNickname,
+		"token":   apitoken,
+	})
+	instance := DiscordInstance{}
+	req, err := http.NewRequest("POST", "http://127.0.0.1:8087/api/v1/bot/instances", bytes.NewBuffer(postData))
+	if err != nil {
+		return nil, errors.Wrap(err, "could not create request")
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not do request")
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&instance); err != nil {
+		return nil, errors.Wrap(err, "could not decode data")
+	}
+
+	if instance.Success == false {
+		return nil, fmt.Errorf("Could not create instance")
+	}
+
+	return &instance, nil
+}
+
 func changeSettings(uuid, token string) error {
 	data, err := json.Marshal(map[string]string{
 		"instanceId": uuid,
-		"nick":       teamspeakCheckNickname,
+		"nick":       checkNickname,
 		"serverHost": "sinusbot.com",
 	})
 	req, err := http.NewRequest("POST", "http://127.0.0.1:8087/api/v1/bot/i/"+uuid+"/settings", bytes.NewBuffer(data))
@@ -116,6 +205,38 @@ func changeSettings(uuid, token string) error {
 	}
 	req.Header.Add("Authorization", "Bearer "+token)
 	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "could not do request")
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("invalid status code received by spawning instance settings")
+	}
+	return nil
+}
+
+func despawnInstance(uuid, token string) error {
+	req, err := http.NewRequest("POST", "http://127.0.0.1:8087/api/v1/bot/i/"+uuid+"/kill", nil)
+	if err != nil {
+		return errors.Wrap(err, "could not create request")
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "could not do request")
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("invalid status code received by despawning instance settings")
+	}
+	return nil
+}
+
+func spawnInstance(uuid, token string) error {
+	req, err := http.NewRequest("POST", "http://127.0.0.1:8087/api/v1/bot/i/"+uuid+"/spawn", nil)
+	if err != nil {
+		return errors.Wrap(err, "could not create request")
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "could not do request")
 	}
