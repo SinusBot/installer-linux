@@ -538,19 +538,6 @@ if [ "$INSTALL" == "Rem" ]; then
   exit 0
 fi
 
-# Private usage only!
-
-redMessage "This SinusBot version is only for private use! Accept?"
-
-OPTIONS=("No" "Yes")
-select OPTION in "${OPTIONS[@]}"; do
-  case "$REPLY" in
-  1) errorQuit ;;
-  2) break ;;
-  *) errorContinue ;;
-  esac
-done
-
 # Ask for YT-DL
 
 redMessage "Should YT-DL be installed/updated?"
