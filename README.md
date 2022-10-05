@@ -4,8 +4,8 @@
 
 ## Officially supported Linux distributions
 
-- Debian 9+
-- Ubuntu 16.10+
+- Debian 10+
+- Ubuntu 18.04+
 - CentOS 7+
 
 ## Features
@@ -20,7 +20,7 @@
 The following tasks will be done:
 
 - Checks if the linux distribution is supported
-- Installs the latest supported version of the teamspeak client
+- Installs the latest supported version of the TeamSpeak client
 - Installs all the necessary dependencies
 - Creates a separated user
 - Installs the latest SinusBot version
