@@ -118,11 +118,11 @@ func TestIsBotOnTeamspeak(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not get instances: %v", err)
 	}
-	if err := despawnInstance(bots[0].UUID, *token); err != nil {
-		t.Fatalf("could not change instance settings: %v", err)
+	if err := killInstance(bots[0].UUID, *token); err != nil {
+		t.Fatalf("could not kill teamspeak instance: %v", err)
 	}
-	if err := despawnInstance(bots[1].UUID, *token); err != nil {
-		t.Fatalf("could not change instance settings: %v", err)
+	if err := killInstance(bots[1].UUID, *token); err != nil {
+		t.Fatalf("could not kill discord instance: %v", err)
 	}
 }
 
@@ -144,7 +144,7 @@ func getInstances(token string) ([]instance, error) {
 }
 
 func getDiscordToken() string {
-	return os.Getenv("DISCORD_KEY")
+	return os.Getenv("DISCORD_API_KEY")
 }
 
 type DiscordInstance struct {
@@ -214,7 +214,7 @@ func changeSettings(uuid, token string) error {
 	return nil
 }
 
-func despawnInstance(uuid, token string) error {
+func killInstance(uuid, token string) error {
 	req, err := http.NewRequest("POST", "http://127.0.0.1:8087/api/v1/bot/i/"+uuid+"/kill", nil)
 	if err != nil {
 		return errors.Wrap(err, "could not create request")
