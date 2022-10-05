@@ -102,6 +102,28 @@ func TestIsBotOnTeamspeak(t *testing.T) {
 	if !found {
 		t.Fatal("no client found")
 	}
+	botId, err := getBotID()
+	if err != nil {
+		t.Fatalf("could not get botId: %v", err)
+	}
+	pw, err := ioutil.ReadFile(".password")
+	if err != nil {
+		t.Fatalf("could not read password file")
+	}
+	token, err := login("admin", string(pw), *botId)
+	if err != nil {
+		t.Fatalf("could not get token: %v", err)
+	}
+	bots, err := getInstances(*token)
+	if err != nil {
+		t.Fatalf("could not get instances: %v", err)
+	}
+	if err := despawnInstance(bots[0].UUID, *token); err != nil {
+		t.Fatalf("could not change instance settings: %v", err)
+	}
+	if err := despawnInstance(bots[1].UUID, *token); err != nil {
+		t.Fatalf("could not change instance settings: %v", err)
+	}
 }
 
 func getInstances(token string) ([]instance, error) {
@@ -188,6 +210,22 @@ func changeSettings(uuid, token string) error {
 	}
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("invalid status code received by spawning instance settings")
+	}
+	return nil
+}
+
+func despawnInstance(uuid, token string) error {
+	req, err := http.NewRequest("POST", "http://127.0.0.1:8087/api/v1/bot/i/"+uuid+"/spawn", nil)
+	if err != nil {
+		return errors.Wrap(err, "could not create request")
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "could not do request")
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("invalid status code received by despawning instance settings")
 	}
 	return nil
 }
