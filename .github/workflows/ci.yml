@@ -1,4 +1,4 @@
-name: "Test CI"
+name: Test
 
 on:
   push:
@@ -29,4 +29,4 @@ jobs:
     - name: Run Tests
       run: go test -v startup_test.go
       env:
-        DISCORD_KEY: ${{ secrets.SINUSBOT_DISCORD_CI }}
+        DISCORD_API_KEY: ${{ secrets.SINUSBOT_DISCORD_API_KEY }}
