@@ -26,10 +26,7 @@ jobs:
       run: |
         go build startup.go
         sudo ./startup
-    - name: Export Discord Token
-      run: 'echo "$DISCORD_KEY" > .discord'
-      shell: bash
-      env:
-        DISCORD_KEY: ${{ secrets.SINUSBOT_DISCORD_CI }}
     - name: Run Tests
       run: go test -v startup_test.go
+      env:
+        DISCORD_KEY: ${{ secrets.SINUSBOT_DISCORD_CI }}
