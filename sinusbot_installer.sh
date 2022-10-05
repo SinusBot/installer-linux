@@ -624,7 +624,7 @@ if [ "$DISCORD" == "false" ]; then
     yum -y -q install screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less ntp python3 iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1 >/dev/null
     update-ca-trust extract >/dev/null
   else
-    # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
+    # Detect if operating system is ubuntu and install chrony. Otherwise install ntp.
     if [ "$OS" == "ubuntu" ]; then
       apt-get -y install chrony
     else
