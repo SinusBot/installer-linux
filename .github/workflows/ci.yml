@@ -5,9 +5,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  DISCORD_TOKEN: ${{ secrets.SINUSBOT_DISCORD_CI }}
-
 jobs:
   test:
     name: Test on ${{ matrix.os }}
@@ -29,5 +26,7 @@ jobs:
       run: |
         go build startup.go
         sudo ./startup
+    - name: Export Discord Token
+      run: echo ${{ secrets.SINUSBOT_DISCORD_CI }} > .discord
     - name: Run Tests
       run: go test -v startup_test.go
