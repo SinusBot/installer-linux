@@ -614,7 +614,9 @@ if [ "$DISCORD" == "false" ]; then
     apt-get install -y -qq --no-install-recommends libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less python3 python-is-python3 iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
     update-ca-certificates >/dev/null
   fi
-
+  if [[ $(cat /etc/*release | grep "PRETTY_NAME=" | sed 's/PRETTY_NAME=//g') =~ "Debian" ]]; then
+      apt-get install -y -qq --no-install-recommends python-is-python3
+  fi
 else
 
   magentaMessage "Installing necessary packages. Please wait..."
@@ -626,7 +628,6 @@ else
     apt-get -qq install ca-certificates bzip2 python3 wget -y >/dev/null
     update-ca-certificates >/dev/null
   fi
-
 fi
 
 greenMessage "Packages installed"!
