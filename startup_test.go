@@ -99,7 +99,9 @@ func TestDiscord(t *testing.T) {
 	time.Sleep(5 * time.Second)
 	/* End workaround */
 
-	success, err := botIsInDiscordChannel(&discordApiToken)
+	var to string
+	to = "454634325556854796"
+	success, err := moveBot(&discordApiToken, &to)
 	if err != nil {
 		t.Fatalf("Something went wrong at discord: %v", err)
 	}
@@ -176,6 +178,14 @@ func TestIsBotOnTeamSpeak(t *testing.T) {
 	}
 	if err := killInstance(bots[0].UUID, *token); err != nil {
 		t.Fatalf("could not kill teamspeak instance: %v", err)
+	}
+	discordApiToken := getDiscordToken()
+	if discordApiToken == "" {
+		t.Fatalf("could not read discord token env")
+	}
+	_, err = moveBot(&discordApiToken, nil)
+	if err != nil {
+		t.Fatalf("Something went wrong at discord: %v", err)
 	}
 	if err := killInstance(bots[1].UUID, *token); err != nil {
 		t.Fatalf("could not kill discord instance: %v", err)
@@ -289,9 +299,9 @@ func login(username string, password string, botId string) (*string, error) {
 	return &lr.Token, nil
 }
 
-func botIsInDiscordChannel(discordApiToken *string) (bool, error) {
-	data, err := json.Marshal(map[string]string{
-		"channel_id": "454634325556854796",
+func moveBot(discordApiToken *string, toChannel *string) (bool, error) {
+	data, err := json.Marshal(map[string]*string{
+		"channel_id": toChannel,
 	})
 	if err != nil {
 		return false, errors.Wrap(err, "could not marshal json")
