@@ -70,19 +70,34 @@ func TestDiscord(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not get token: %v", err)
 	}
-	instance, err := createDiscordInstance(discordApiToken, *token)
+	uuid, err := createDiscordInstance(discordApiToken, *token)
 	if err != nil {
 		t.Fatalf("could not create instance: %v", err)
 	}
-	fmt.Println("Created instance ", instance)
+	fmt.Printf("Created instance %v\n", *uuid)
 
-	if err := updateInstance(*instance, *token, "", "152947849393471488/452453323891671041"); err != nil {
+	if err := updateInstance(*uuid, *token, true, "152947849393471488/454634325556854796"); err != nil {
 		t.Fatalf("could not change instance settings: %v", err)
 	}
 
-	if err := spawnInstance(*instance, *token); err != nil {
+	if err := spawnInstance(*uuid, *token); err != nil {
 		t.Fatalf("could not spawn discord instance: %v", err)
 	}
+	/* Workaround for SinusBot bug */
+	if err := updateInstance(*uuid, *token, true, "152947849393471488/452453323891671041"); err != nil {
+		t.Fatalf("could not change instance settings: %v", err)
+	}
+
+	if err := killInstance(*uuid, *token); err != nil {
+		t.Fatalf("could not kill discord instance: %v", err)
+	}
+
+	if err := spawnInstance(*uuid, *token); err != nil {
+		t.Fatalf("could not spawn discord instance: %v", err)
+	}
+
+	time.Sleep(5 * time.Second)
+	/* End workaround */
 
 	success, err := botIsInDiscordChannel(&discordApiToken)
 	if err != nil {
@@ -90,9 +105,9 @@ func TestDiscord(t *testing.T) {
 	}
 
 	if success {
-		fmt.Println("Bot is connected")
+		fmt.Printf("Bot is connected\n")
 	} else {
-		t.Fatalf("Bot couldn't be found")
+		t.Fatalf("Bot couldn't be found\n")
 	}
 }
 
@@ -113,7 +128,7 @@ func TestConnectToTeamSpeak(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not get instances: %v", err)
 	}
-	if err := updateInstance(bots[0].UUID, *token, "sinusbot.com", ""); err != nil {
+	if err := updateInstance(bots[0].UUID, *token, false, "sinusbot.com"); err != nil {
 		t.Fatalf("could not change instance settings: %v", err)
 	}
 	fmt.Println("Sleeping so that the bot will connect in this time to the server")
@@ -188,7 +203,7 @@ func createDiscordInstance(discordApiToken string, token string) (*string, error
 }
 
 func getInstances(token string) ([]SinusBotInstance, error) {
-	resp, err := executeGetRequest("/bot/instances", nil, &token)
+	resp, err := executeGetRequest("/bot/instances", &token)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get instances")
 	}
@@ -199,14 +214,26 @@ func getInstances(token string) ([]SinusBotInstance, error) {
 	return data, nil
 }
 
-func updateInstance(uuid string, token string, host string, channel string) error {
-	data, err := json.Marshal(map[string]string{
-		"instanceId":  uuid,
-		"nick":        checkNickname,
-		"serverHost":  host,
-		"channelName": channel,
-	})
-	_, err = executePostRequest("/bot/i/"+uuid+"/settings", http.StatusOK, &token, bytes.NewBuffer(data))
+func updateInstance(uuid string, token string, isDiscord bool, arg string) error {
+	var data []byte
+	var jsonErr error
+	if isDiscord {
+		data, jsonErr = json.Marshal(map[string]string{
+			"instanceId":  uuid,
+			"nick":        checkNickname,
+			"channelName": arg,
+		})
+	} else {
+		data, jsonErr = json.Marshal(map[string]string{
+			"instanceId": uuid,
+			"nick":       checkNickname,
+			"serverHost": arg,
+		})
+	}
+	if jsonErr != nil {
+		return errors.Wrap(jsonErr, "Could not create json")
+	}
+	_, err := executePostRequest("/bot/i/"+uuid+"/settings", http.StatusOK, &token, bytes.NewBuffer(data))
 	if err != nil {
 		return errors.Wrap(err, "could not change instance settings")
 	}
@@ -230,7 +257,7 @@ func spawnInstance(uuid string, token string) error {
 }
 
 func getBotID() (*string, error) {
-	resp, err := executeGetRequest("/botId", nil, nil)
+	resp, err := executeGetRequest("/botId", nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get")
 	}
@@ -274,6 +301,7 @@ func botIsInDiscordChannel(discordApiToken *string) (bool, error) {
 		return false, errors.Wrap(err, "could not create request")
 	}
 	req.Header.Add("Authorization", "Bot "+*discordApiToken)
+	req.Header.Add("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return false, errors.Wrap(err, "could not do request")
@@ -286,7 +314,7 @@ func botIsInDiscordChannel(discordApiToken *string) (bool, error) {
 		return false, errors.Wrap(err, "could not decode data")
 	}
 	if errorResponse.Code == 40032 {
-		return false, fmt.Errorf("Bot is not connected to voice: %v", errorResponse.Message)
+		return false, nil // This is a known bug in sinusbot rn
 	} else {
 		return false, fmt.Errorf("Unknown error occured: %d (%v)", errorResponse.Code, errorResponse.Message)
 	}
@@ -295,16 +323,20 @@ func botIsInDiscordChannel(discordApiToken *string) (bool, error) {
 /* SinusBot api wrapper */
 
 func executePostRequest(endpoint string, expectedStatusCode int, token *string, data *bytes.Buffer) (*http.Response, error) {
-	req, err := http.NewRequest("POST", "http://127.0.0.1:8087/api/v1"+endpoint, data)
+	var req *http.Request
+	var err error
+	if data != nil {
+		req, err = http.NewRequest("POST", "http://127.0.0.1:8087/api/v1"+endpoint, data)
+	} else {
+		req, err = http.NewRequest("POST", "http://127.0.0.1:8087/api/v1"+endpoint, nil)
+	}
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create request")
 	}
 	if token != nil {
 		req.Header.Add("Authorization", "Bearer "+*token)
 	}
-	if data != nil {
-		req.Header.Add("Content-Type", "application/json")
-	}
+	req.Header.Add("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not do request")
@@ -315,8 +347,8 @@ func executePostRequest(endpoint string, expectedStatusCode int, token *string, 
 	return resp, nil
 }
 
-func executeGetRequest(endpoint string, uuid *string, token *string) (*http.Response, error) {
-	req, err := http.NewRequest("GET", "http://127.0.0.1:8087/api/v1/"+endpoint, nil)
+func executeGetRequest(endpoint string, token *string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", "http://127.0.0.1:8087/api/v1"+endpoint, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create request")
 	}
