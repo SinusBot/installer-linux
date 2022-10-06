@@ -147,7 +147,7 @@ func TestConnectToTeamSpeak(t *testing.T) {
 		t.Fatalf("could not spawn teamspeak instance: %v", err)
 	}
 	fmt.Println("Sleeping so that the bot will connect in this time to the server")
-	time.Sleep(20 * time.Second)
+	time.Sleep(5 * time.Second)
 }
 
 func TestIsBotOnTeamSpeak(t *testing.T) {
