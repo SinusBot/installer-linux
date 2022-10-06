@@ -1,6 +1,6 @@
 # SinusBot Installer for Linux
 
-![Build Status](https://github.com/sinusbot/installer-linux/workflows/CI/badge.svg)
+![Build Status](https://github.com/sinusbot/installer-linux/workflows/ci.yml/badge.svg)
 
 ## Officially supported Linux distributions
 
