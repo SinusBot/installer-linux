@@ -108,8 +108,18 @@ func TestDiscord(t *testing.T) {
 
 	if success {
 		fmt.Printf("Bot is connected\n")
+		_, err = moveBot(&discordApiToken, nil)
+		if err != nil {
+			t.Fatalf("Something went wrong at discord: %v", err)
+		}
+		if err := killInstance(*uuid, *token); err != nil {
+			t.Fatalf("could not kill discord instance: %v", err)
+		}
 	} else {
-		t.Fatalf("Bot couldn't be found\n")
+		if err := killInstance(*uuid, *token); err != nil {
+			t.Fatalf("could not kill discord instance: %v", err)
+		}
+		fmt.Printf("Bot couldn't be found\n")
 	}
 }
 
@@ -134,7 +144,7 @@ func TestConnectToTeamSpeak(t *testing.T) {
 		t.Fatalf("could not change instance settings: %v", err)
 	}
 	fmt.Println("Sleeping so that the bot will connect in this time to the server")
-	time.Sleep(5 * time.Second)
+	time.Sleep(20 * time.Second)
 }
 
 func TestIsBotOnTeamSpeak(t *testing.T) {
@@ -178,17 +188,6 @@ func TestIsBotOnTeamSpeak(t *testing.T) {
 	}
 	if err := killInstance(bots[0].UUID, *token); err != nil {
 		t.Fatalf("could not kill teamspeak instance: %v", err)
-	}
-	discordApiToken := getDiscordToken()
-	if discordApiToken == "" {
-		t.Fatalf("could not read discord token env")
-	}
-	_, err = moveBot(&discordApiToken, nil)
-	if err != nil {
-		t.Fatalf("Something went wrong at discord: %v", err)
-	}
-	if err := killInstance(bots[1].UUID, *token); err != nil {
-		t.Fatalf("could not kill discord instance: %v", err)
 	}
 }
 
