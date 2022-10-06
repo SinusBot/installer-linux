@@ -143,6 +143,9 @@ func TestConnectToTeamSpeak(t *testing.T) {
 	if err := updateInstance(bots[0].UUID, *token, false, "sinusbot.com"); err != nil {
 		t.Fatalf("could not change instance settings: %v", err)
 	}
+	if err := spawnInstance(bots[0].UUID, *token); err != nil {
+		t.Fatalf("could not spawn teamspeak instance: %v", err)
+	}
 	fmt.Println("Sleeping so that the bot will connect in this time to the server")
 	time.Sleep(20 * time.Second)
 }
