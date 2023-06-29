@@ -627,6 +627,8 @@ else
   # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
   if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
     apt-get -y install chrony
+  elif [ "$OSRELEASE" == "22.04" ] && [ "$OS" == "ubuntu" ]; then
+    echo 'NTP=0.pool.ntp.org' >> /etc/systemd/timesyncd.conf && systemctl restart systemd-timesyncd.service
   else
     apt-get -y install ntp
   fi
@@ -663,7 +665,7 @@ else
       else
         errorExit "Error while setting time via chrony"!
       fi
-    else
+    elif [ "$OSRELEASE" != "22.04" ]; then
       if [[ -f /etc/centos-release ]]; then
        service ntpd stop
       else
@@ -941,7 +943,8 @@ if [ "$YT" == "Yes" ]; then
   fi
 
   greenMessage "Downloading YT-DL now..."
-  wget -q -O /usr/local/bin/youtube-dl http://yt-dl.org/downloads/latest/youtube-dl
+  wget -q https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/youtube-dl
+  #wget -q -O /usr/local/bin/youtube-dl http://yt-dl.org/downloads/latest/youtube-dl
 
   if [ ! -f /usr/local/bin/youtube-dl ]; then
     errorExit "Download failed! Exiting now"!
